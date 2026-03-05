@@ -1,0 +1,690 @@
+================================================================================
+               GUIDA ALLE FUNZIONI ESTERNE - cub3D
+================================================================================
+
+Questo documento spiega in dettaglio tutte le funzioni esterne autorizzate
+dal subject di cub3D, con teoria e esempi pratici.
+
+================================================================================
+INDICE
+================================================================================
+
+1. Funzioni di Input/Output (open, close, read, write)
+2. Funzioni di Memoria (malloc, free)
+3. Funzioni di Output (printf)
+4. Funzioni di Errore (perror, strerror)
+5. Funzioni di Sistema (exit, gettimeofday)
+6. Libreria Math
+7. MiniLibX
+8. Libft
+
+================================================================================
+1. FUNZIONI DI INPUT/OUTPUT
+================================================================================
+
+open()
+--------
+Prototipo: int open(const char *pathname, int flags, ... /* mode_t mode */)
+
+Descrizione:
+Apre un file e restituisce un file descriptor (numero intero positivo).
+Il file descriptor è un identificatore usato dalle altre funzioni I/O.
+
+Parametri:
+- pathname: percorso del file da aprire
+- flags: modalità di apertura (O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_TRUNC)
+
+Valore di ritorno:
+- Successo: file descriptor (numero >= 0)
+- Errore: -1
+
+Esempio:
+    int fd = open("maps/test.cub", O_RDONLY);
+    if (fd == -1)
+        perror("Errore apertura file");
+
+Note per cub3D:
+- Usare O_RDONLY per leggere file .cub
+- Il file descriptor deve essere chiuso con close()
+
+close()
+--------
+Prototipo: int close(int fd)
+
+Descrizione:
+Chiude un file descriptor precedentemente aperto.
+
+Parametri:
+- fd: file descriptor da chiudere
+
+Valore di ritorno:
+- Successo: 0
+- Errore: -1
+
+Esempio:
+    int fd = open("maps/test.cub", O_RDONLY);
+    // ... usa il file ...
+    close(fd);
+
+Note per cub3D:
+- IMPORTANTE: chiudere SEMPRE i file descriptor aperti
+- Non chiudere due volte lo stesso fd
+- Verificare sempre il valore di ritorno in caso di errore
+
+read()
+--------
+Prototipo: ssize_t read(int fd, void *buf, size_t count)
+
+Descrizione:
+Legge fino a 'count' byte da un file descriptor in un buffer.
+
+Parametri:
+- fd: file descriptor
+- buf: buffer dove memorizzare i dati
+- count: numero massimo di byte da leggere
+
+Valore di ritorno:
+- Numero di byte letti (> 0)
+- 0: fine del file (EOF)
+- -1: errore
+
+Esempio:
+    char buffer[1024];
+    ssize_t bytes_read = read(fd, buffer, 1024);
+    if (bytes_read == -1)
+        perror("Errore lettura");
+
+Note per cub3D:
+- Usare in combinazione con open() per leggere il file .cub
+- Il buffer deve essere grande abbastanza
+- Gestire il caso EOF
+
+write()
+--------
+Prototipo: ssize_t write(int fd, const void *buf, size_t count)
+
+Descrizione:
+Scrive 'count' byte da un buffer a un file descriptor.
+
+Parametri:
+- fd: file descriptor
+- buf: buffer contenente i dati da scrivere
+- count: numero di byte da scrivere
+
+Valore di ritorno:
+- Numero di byte scritti
+- -1: errore
+
+Esempio:
+    const char *msg = "Error\n";
+    write(STDERR_FILENO, msg, 6);
+
+Note per cub3D:
+- Usare STDERR_FILENO (2) per messaggi di errore
+- printf() è più comodo per output formattato
+
+================================================================================
+2. FUNZIONI DI MEMORIA
+================================================================================
+
+malloc()
+---------
+Prototipo: void *malloc(size_t size)
+
+Descrizione:
+Alloca un blocco di memoria di 'size' byte.
+
+Parametri:
+- size: numero di byte da allocare
+
+Valore di ritorno:
+- Successo: puntatore alla memoria allocata
+- Errore: NULL
+
+Esempio:
+    char *line = malloc(1024 * sizeof(char));
+    if (!line)
+        return (NULL);
+
+Note per cub3D:
+- Inizializzare sempre la memoria (usare memset o calloc)
+- Verificare sempre il puntatore restituito
+- Ricordare di liberare la memoria con free()
+
+free()
+--------
+Prototipo: void free(void *ptr)
+
+Descrizione:
+Libera un blocco di memoria precedentemente allocato.
+
+Parametri:
+- ptr: puntatore alla memoria da liberare
+
+Valore di ritorno:
+- Nessuno
+
+Esempio:
+    char *line = malloc(1024);
+    // ... usa la memoria ...
+    free(line);
+    line = NULL;  // buona pratica
+
+Note per cub3D:
+- IMPORTANTE: liberare TUTTA la memoria allocata
+- Non usare free() su puntatori non allocati con malloc
+- Non usare free() due volte sullo stesso puntatore
+- Settare il puntatore a NULL dopo free()
+
+================================================================================
+3. FUNZIONI DI OUTPUT
+================================================================================
+
+printf()
+---------
+Prototipo: int printf(const char *format, ...)
+
+Descrizione:
+Stampa output formattato su stdout.
+
+Parametri:
+- format: stringa di formato
+- ...: argomenti variabili
+
+Valore di ritorno:
+- Numero di caratteri stampati
+- Negativo in caso di errore
+
+Specificatori di formato:
+- %c - carattere
+- %s - stringa
+- %d - intero decimale
+- %u - intero senza segno
+- %x - esadecimale
+- %f - floating point
+- %p - puntatore
+
+Esempio:
+    printf("Valore: %d, Stringa: %s\n", 42, "test");
+    printf("Carattere: %c\n", 'A');
+    printf("Pointer: %p\n", (void *)ptr);
+
+Note per cub3D:
+- Usare per messaggi di debug
+- Attenzione ai memory leaks nelle funzioni ricorsive
+- Usare write() per Error\n (più veloce)
+
+================================================================================
+4. FUNZIONI DI ERRORE
+================================================================================
+
+perror()
+---------
+Prototipo: void perror(const char *s)
+
+Descrizione:
+Stampa un messaggio di errore su stderr, descrivendo l'ultimo errore
+verificatosi in una chiamata di sistema o libreria.
+
+Parametri:
+- s: stringa stampata prima del messaggio di errore
+
+Valore di ritorno:
+- Nessuno
+
+Esempio:
+    int fd = open("file.txt", O_RDONLY);
+    if (fd == -1)
+        perror("open");  // Stampa: open: No such file or directory
+
+Note per cub3D:
+- Usare per messaggi dirittivi
+- errore desc Chiamare subito dopo una funzione che ha fallito
+
+strerror()
+-----------
+Prototipo: char *strerror(int errnum)
+
+Descrizione:
+Restituisce una stringa che descrive il codice di errore.
+
+Parametri:
+- errnum: numero di errore (tipicamente errno)
+
+Valore di ritorno:
+- Puntatore a stringa statica con il messaggio
+
+Esempio:
+    #include <errno.h>
+    int fd = open("file.txt", O_RDONLY);
+    if (fd == -1)
+        printf("Errore: %s\n", strerror(errno));
+
+Note per cub3D:
+- Meno comune di perror()
+- Utile per messaggi di errore personalizzati
+
+================================================================================
+5. FUNZIONI DI SISTEMA
+================================================================================
+
+exit()
+--------
+Prototipo: void exit(int status)
+
+Descrizione:
+Termina il programma immediatamente.
+
+Parametri:
+- status: codice di uscita (0 = successo, alti = errore)
+
+Valore di ritorno:
+- Nessuno (non ritorna mai)
+
+Esempio:
+    if (error_condition)
+    {
+        printf("Error\nMessaggio di errore\n");
+        exit(1);  // Esci con errore
+    }
+    exit(0);  // Esci con successo
+
+Note per cub3D:
+- Usare exit(1) per errori
+- Usare exit(0) per uscita normale
+- Chiamare free() PRIMA di exit() per pulizia
+- Attenzione: exit() chiude anche i file aperti
+
+gettimeofday()
+---------------
+Prototipo: int gettimeofday(struct timeval *tv, struct timezone *tz)
+
+Descrizione:
+Ottiene l'ora corrente del sistema.
+
+Parametri:
+- tv: puntatore a struttura timeval (sarà riempita con l'ora)
+- tz: puntatore a struttura timezone (obsoleto, passare NULL)
+
+Valore di ritorno:
+- 0: successo
+- -1: errore
+
+Struttura timeval:
+    struct timeval {
+        time_t      tv_sec;   // secondi
+        suseconds_t tv_usec;  // microsecondi
+    };
+
+Esempio:
+    struct timeval start;
+    gettimeofday(&start, NULL);
+    // ... fai qualcosa ...
+    struct timeval end;
+    gettimeofday(&end, NULL);
+    double elapsed = (end.tv_sec - start.tv_sec) + 
+                     (end.tv_usec - start.tv_usec) / 1000000.0;
+
+Note per cub3D:
+- Usare per calcolare il tempo di rendering (FPS)
+- Utile per animazioni fluide
+- Includere <sys/time.h>
+
+================================================================================
+6. LIBRERIA MATH (-lm)
+================================================================================
+
+La libreria math contiene funzioni matematiche. Per usarla:
+    #include <math.h>
+    gcc program.c -lm
+
+FUNZIONI TRIGONOMETRICHE
+------------------------
+
+sin()    - Seno (angolo in radianti)
+cos()    - Coseno
+tan()    - Tangente
+asin()   - Arcsen
+acos()   - Arccos
+atan()   - Arctan
+atan2()  - Arctan con due parametri (per angoli completi)
+
+Esempio:
+    double angle = M_PI / 4;  // 45 gradi
+    double s = sin(angle);    // 0.707...
+    double c = cos(angle);    // 0.707...
+
+Note per cub3D:
+- ANGOLI IN RADIANTI, non gradi!
+- M_PI = 3.1415926535... (definito in math.h)
+- Convertire: radians = degrees * M_PI / 180
+
+FUNZIONI DI POTENZA E RADICE
+-----------------------------
+
+sqrt()   - Radice quadrata
+pow()    - Potenza (base ^ esponente)
+cbrt()   - Radice cubica
+
+Esempio:
+    double dist = sqrt(x * x + y * y);
+    double val = pow(2, 3);  // 8.0
+
+FUNZIONI DI ARROTONDAMENTO
+---------------------------
+
+floor()  - Arrotonda per difetto
+ceil()   - Arrotonda per eccesso
+round()  - Arrotonda al più vicino
+fabs()   - Valore assoluto (float/double)
+
+Esempio:
+    double x = 3.7;
+    double a = floor(x);  // 3.0
+    double b = ceil(x);   // 4.0
+    double c = fabs(-3.7); // 3.7
+
+FUNZIONI UTILI PER RAYCASTING
+-----------------------------
+
+hypot()  - sqrt(x*x + y*y) - distanza euclidea
+fmod()   - Resto della divisione (utile per wraparound)
+
+Esempio (raycasting):
+    // Calcola distanza perpendicolare (evita fisheye)
+    double perpWallDist = (side == 0) ? 
+        (mapX - rayX + (1 - stepX) / 2) / rayDirX :
+        (mapY - rayY + (1 - stepY) / 2) / rayDirY;
+
+================================================================================
+7. MINILIBX
+================================================================================
+
+MiniLibX è una libreria grafica leggera sviluppata da 42 per la creazione
+di finestre e la gestione di immagini.
+
+INIZIALIZZAZIONE
+----------------
+
+mlx_init()
+-----------
+Prototipo: void *mlx_init()
+
+Descrizione:
+Inizializza la connessione con il server X (o Window).
+
+Valore di ritorno:
+- Puntatore opaque (void *) da usare per altre funzioni
+- NULL in caso di errore
+
+Esempio:
+    void *mlx = mlx_init();
+    if (!mlx)
+        exit(1);
+
+GESTIONE FINESTRE
+-----------------
+
+mlx_new_window()
+-----------------
+Prototipo: void *mlx_new_window(void *mlx_ptr, int width, int height, char *title)
+
+Descrizione:
+Crea una nuova finestra.
+
+Parametri:
+- mlx_ptr: puntatore restituito da mlx_init()
+- width, height: dimensioni finestra in pixel
+- title: titolo della finestra
+
+Valore di ritorno:
+- Puntatore alla finestra
+
+Esempio:
+    void *win = mlx_new_window(mlx, 800, 600, "cub3D");
+    if (!win)
+        exit(1);
+
+mlx_destroy_window()
+--------------------
+Prototipo: int mlx_destroy_window(void *mlx_ptr, void *win_ptr)
+
+Descrizione:
+Distrugge una finestra.
+
+mlx_clear_window()
+------------------
+Prototipo: int mlx_clear_window(void *mlx_ptr, void *win_ptr)
+
+Descrizione:
+Pulisce la finestra (la riempie di nero).
+
+mlx_loop()
+----------
+Prototipo: int mlx_loop(void *mlx_ptr)
+
+Descrizione:
+Entra nel loop degli eventi (blocca il programma).
+
+GESTIONE IMMAGINI
+-----------------
+
+mlx_new_image()
+---------------
+Prototipo: void *mlx_new_image(void *mlx_ptr, int width, int height)
+
+Descrizione:
+Crea una nuova immagine in memoria.
+
+Parametri:
+- width, height: dimensioni immagine
+
+Valore di ritorno:
+- Puntatore all'immagine
+
+mlx_get_data_addr()
+-------------------
+Prototipo: char *mlx_get_data_addr(void *img_ptr, int *bits_per_pixel, int *size_line, int *endian)
+
+Descrizione:
+Ottiene l'indirizzo dei pixel dell'immagine.
+
+Parametri (modificati dalla funzione):
+- bits_per_pixel: bit per pixel (32 per RGBA)
+- size_line: byte per riga dell'immagine
+- endian: ordine dei byte
+
+Valore di ritorno:
+- Puntatore ai dati dei pixel
+
+Esempio:
+    char *img_data = mlx_get_data_addr(img, &bpp, &size_line, &endian);
+    // Per modificare un pixel in posizione (x, y):
+    int pixel_pos = y * size_line + x * (bpp / 8);
+    img_data[pixel_pos + 0] = r;  // Rosso
+    img_data[pixel_pos + 1] = g;  // Verde
+    img_data[pixel_pos + 2] = b;  // Blu
+    img_data[pixel_pos + 3] = a;  // Alpha
+
+mlx_put_image_to_window()
+-------------------------
+Prototipo: int mlx_put_image_to_window(void *mlx_ptr, void *win_ptr, void *img_ptr, int x, int y)
+
+Descrizione:
+Disegna un'immagine nella finestra.
+
+mlx_destroy_image()
+-------------------
+Prototipo: int mlx_destroy_image(void *mlx_ptr, void *img_ptr)
+
+Descrizione:
+Distrugge un'immagine.
+
+FUNZIONI PER COLORI
+-------------------
+
+mlx_get_color_value()
+---------------------
+Prototipo: unsigned int mlx_get_color_value(void *mlx_ptr, int color)
+
+Descrizione:
+Converte un colore nel formato MiniLibX.
+
+Parametri:
+- color: colore nel formato 0xRRGGBB
+
+Valore di ritorno:
+- Colore nel formato MiniLibX (0x00BBGGRR in little-endian)
+
+GESTIONE EVENTI
+---------------
+
+mlx_hook()
+----------
+Prototipo: int mlx_hook(void *win_ptr, int x_event, int x_mask, int (*funct)(), void *param)
+
+Descrizione:
+Registra una callback per un evento.
+
+Parametri:
+- win_ptr: puntatore alla finestra
+- x_event: tipo di evento (KeyPress, KeyRelease, etc.)
+- x_mask: maschera evento (sempre 0 per eventi base)
+- funct: funzione callback
+- param: parametro passato alla callback
+
+Eventi comuni:
+- KeyPress (2) - Tasto premuto
+- KeyRelease (3) - Tasto rilasciato
+- DestroyNotify (17) - Finestra chiusa
+- ButtonPress (4) - Mouse premuto
+- ButtonRelease (5) - Mouse rilasciato
+
+mlx_loop_hook()
+---------------
+Prototipo: int mlx_loop_hook(void *mlx_ptr, int (*funct)(), void *param)
+
+Descrizione:
+Registra una funzione chiamata ad ogni iterazione del loop.
+
+mlx_expose_hook()
+-----------------
+Prototipo: int mlx_expose_hook(void *win_ptr, int (*funct)(), void *param)
+
+Descrizione:
+Callback quando la finestra deve essere ridisegnata.
+
+mlx_key_hook()
+--------------
+Prototipo: int mlx_key_hook(void *win_ptr, int (*funct)(), void *param)
+
+Descrizione:
+Callback per tasti della tastiera.
+
+mlx_mouse_hook()
+----------------
+Prototipo: int mlx_mouse_hook(void *win_ptr, int (*funct)(), void *param)
+
+Descrizione:
+Callback per eventi del mouse.
+
+FUNZIONI UTILI
+-------------
+
+mlx_do_key_autorepeato()
+------------------------
+Attiva/disattiva il repeat automatico dei tasti.
+
+mlx_string_put()
+----------------
+Prototipo: int mlx_string_put(void *mlx_ptr, void *win_ptr, int x, int y, int color, char *string)
+
+Descrizione:
+Disegna testo nella finestra (pixel art, non TrueType).
+
+================================================================================
+8. LIBFT
+================================================================================
+
+Libft è la tua libreria personale con implementazioni di funzioni standard C.
+
+FUNZIONI DI STRINGA
+------------------
+
+ft_strlen()    - Lunghezza stringa
+ft_strcpy()    - Copia stringa
+ft_strncpy()   - Copia con limite
+ft_strcat()    - Concatena stringa
+ft_strncat()   - Concatena con limite
+ft_strdup()    - Duplica stringa (malloc + copy)
+ft_substr()    - Sottostringa
+ft_strjoin()   - Unisci due stringhe
+ft_strtrim()   - Taglia caratteri da inizio/fine
+ft_split()     - Dividi stringa per separatore
+
+FUNZIONI DI MEMORIA
+-------------------
+
+ft_memset()    - Inizializza memoria
+ft_bzero()     - Azzera memoria
+ft_memcpy()    - Copia memoria
+ft_memmove()   - Copia memoria (overlap sicuro)
+ft_memchr()    - Trova byte in memoria
+ft_memcmp()    - Confronta memoria
+
+FUNZIONI DI CONVERSIONE
+----------------------
+
+ft_atoi()      - Stringa a intero
+ft_itoa()      - Intero a stringa
+
+FUNZIONI CARATTERE
+------------------
+
+ft_isalpha()   - È lettera?
+ft_isdigit()   - È cifra?
+ft_isalnum()   - È alfanumerico?
+ft_isascii()   - È ASCII?
+ft_isprint()   - È stampabile?
+ft_toupper()   - Maiuscolo
+ft_tolower()   - Minuscolo
+
+FUNZIONI LISTE (bonus)
+----------------------
+
+ft_lstnew()    - Crea nuovo nodo lista
+ft_lstadd_front() - Aggiungi in testa
+ft_lstadd_back()  - Aggiungi in coda
+ft_lstdelone()  - Elimina un nodo
+ft_lstclear()   - Elimina lista
+ft_lstiter()   - Itera lista
+ft_lstmap()     - Mappa lista
+
+================================================================================
+SOMMARIO USO NEL PROGETTO
+================================================================================
+
+PARSER (.cub file):
+- open(), close(), read() - Lettura file
+- malloc(), free() - Allocazione memoria per stringhe
+- ft_strdup(), ft_split(), ft_atoi() - Parsing dati
+- perror(), strerror() - Errori
+
+RAYCASTING (rendering):
+- mlx_init(), mlx_new_window() - Finestra
+- mlx_new_image(), mlx_get_data_addr() - Buffer rendering
+- sin(), cos(), tan(), sqrt() - Calcoli matematici
+- mlx_put_image_to_window() - Disposizione immagine
+
+EVENTI (input):
+- mlx_hook(), mlx_key_hook() - Gestione tasti
+- exit() - Uscita pulita
+
+GAME LOOP:
+- gettimeofday() - Calcolo FPS e timing
+- mlx_loop() - Loop principale
+- printf() - Debug (solo in fase di sviluppo)
+
+================================================================================
+
+*Documento creato per il progetto cub3D - Cyber Escape*

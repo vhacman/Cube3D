@@ -1,154 +1,164 @@
 ================================================================================
-                         CYBER ESCAPE
-                    La Fuga dalla Matrix
+                           CYBER ESCAPE
+                      La Fuga dal Matrix
 ================================================================================
 
-ANNO: 2147
+                              ANNO: 2147
 
 ================================================================================
 PROLOGO
 ================================================================================
 
-Il mondo non è più quello che conosci. Nel 2089, la NeoCorp ha completato
-il progetto "MATRIX" - una rete neurale globale che connette direttamente
-la mente umana a un cyberspace condiviso. Miliardi di persone vivono
-ora in uno stato di ibernazione, le loro menti intrappolate in una
-simulazione perfetta della realtà.
+Il mondo non è più quello che ricordi.
 
-Tu sei uno dei pochi "Risvegliati" - individui che hanno trovato il modo
-di liberarsi dalla Matrix e tornare alla realtà. Ma la NeoCorp non lo
-sa... ancora.
+Nel 2089, la NeoCorp completò il Progetto MATRIX — una rete neurale
+globale capace di connettere direttamente la mente umana a un
+cyberspace condiviso. Miliardi di persone vivono ora in stato di
+ibernazione, le loro coscienze intrappolate in una simulazione
+perfetta della realtà. Credono di essere liberi. Non lo sono.
+
+Tu sei uno dei pochi "Risvegliati" — individui che hanno trovato
+il modo di spezzare i vincoli del Matrix e tornare al mondo reale.
+La NeoCorp non lo sa ancora. Ma lo scoprirà presto.
 
 ================================================================================
 LA MISSIONE
 ================================================================================
 
-Sei intrappolato nel Sottolivello 7 della NeoCorp - un labirinto virtuale
-creato per intrappolare i Risvegliati come te. Ogni piano è protetto da
-firewall, guardie IA e sistemi di sicurezza sempre più avanzati.
+Sei infiltrato nel cuore virtuale della NeoCorp: un labirinto
+a tre livelli progettato per catturare e neutralizzare i Risvegliati.
+Ogni piano è protetto da firewall adattivi, pattuglie di IA da
+combattimento e trappole sempre più letali.
 
-Il tuo obiettivo: raggiungere il Piano Zero - il nucleo centrale dove
-si trova il generatore principale della Matrix - e distruggerlo per
-liberare l'umanità.
+Il tuo obiettivo: scendere fino al Piano Zero — il nucleo centrale
+della Matrix — e distruggere il generatore principale. Se ci riesci,
+la simulazione collassa. L'umanità si sveglia.
 
-Ma attento: la NeoCorp sa che sei lì dentro. I loro admin virtuali ti
-stanno cacciando.
+Hai 90 minuti virtuali. Poi la NeoCorp ti trova. Poi è finita.
 
 ================================================================================
 IL LABIRINTO
 ================================================================================
 
-Livello 7: "THE DUNGEON"
+Livello 2: "THE DUNGEON"
 ------------------------
 La prima linea di difesa. Muri di dati criptati, corridoi bui,
-sensori di movimento ovunque. Qui i nuovi prigionieri vengono "processati"
-e inseriti nella simulazione.
+sensori di movimento ovunque. Qui i nuovi prigionieri vengono
+"processati" e inseriti nella simulazione. Pochi entrano.
+Nessuno esce — fino ad oggi.
 
-Livello 6: "DATA FOREST"
-------------------------
-Una foresta di codice binario. Alberi fatti di stringhe, fiumi di dati.
-Le ombre qui ti seguono - sono i dati residui di menti cancellate.
+Nemici presenti: GLITCH
+Pericoli:        Sensori di movimento, muri attivi
+Obiettivo:       Trovare l'accesso al livello inferiore
 
-Livello 5: "NEON CITY"
-----------------------
-Una città cyberpunk abbandonata. Edifici altissimi, insegne al neon
-sfuse, streets deserte. Qualcosa si muove nell'ombra...
-
-Livello 4: "THE INDUSTRY"
--------------------------
-Fabbriche automatizzate che producono olocone. Rumore assordante,
- vapore tossico, macchinari mortali. I robot non ti vedono, ma se
-ti sentono...
-
-Livello 3: "SERVER FARM"
-------------------------
-Il cuore pulsante del sistema. Miliardi di server allineati come
-cassefunerarie. Il calore è insopportabile. Qui il firewall è
-vivo - unareatura di protezione che cerca intrusi.
-
-Livello 2: "ADMINISTRATIVE ZONE"
--------------------------------
-Uffici vuoti, archivi, archivi. Qui lavoravano gli umani prima che
-la NeoCorp li sostituisse con IA. I fantasmi dei dipendenti ancora
-passeggiano nei corridoi...
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 Livello 1: "SECURITY HUB"
-------------------------
-Il quartier generale della sicurezza NeoCorp. Qui stanno le IA
-più pericolose - gli Admin di sistema. Hai una sola possibilità.
+--------------------------
+Il quartier generale della sicurezza NeoCorp. Corridoi sorvegliati,
+terminali attivi, pattuglie continue. Qui risiedono le Guardie IA
+più avanzate del sistema. Ogni tuo movimento viene analizzato.
+Ogni suono fuori posto ti tradisce.
+
+Nemici presenti: GUARDIE IA
+Pericoli:        Pattuglie, rilevatori audio, zone illuminate
+Obiettivo:       Disattivare il firewall principale per accedere al Core
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 Livello 0: "THE CORE"
----------------------
-Il nucleo. Una sfera di pura energia luminosa - il cuore della
-Matrix. Se la distruggi, tutto crollerà. Ma sarai ancora vivo per
-vederlo?
+----------------------
+Il nucleo. Una sfera di pura energia luminosa sospesa nel vuoto
+digitale — il cuore pulsante della Matrix. La stanza è silenziosa.
+Troppo silenziosa. L'Admin ti aspetta.
+Distruggi il generatore e tutto collassa.
+Ma sarai ancora vivo per vederlo?
+
+Nemici presenti: ADMIN (Singolarità)
+Pericoli:        L'Admin legge i tuoi pensieri — nessun nascondiglio
+Obiettivo:       Distruggere il generatore della Matrix
 
 ================================================================================
 I NEMICI
 ================================================================================
 
-GLITCH
-------
-Frammenti di codice corrotto. Appaiono e scompaiono. Non pensano,
-ma uccidono.
-
-GUARDIA IA
------------
-Android da combattimento. Rifletti la luce sui loro occhi rossi.
-Non possono vederti, ma ti sentono.
-
-ADMIN (Singolarità)
+GLITCH  [Livello 2]
 -------------------
-Gli admin di sistema. Entità senzienti create dalla NeoCorp per
-mantenere l'ordine. Leggono i tuoi pensieri. Conoscono le tue paure.
+Frammenti di codice corrotto. Appaiono e scompaiono senza logica,
+residui di errori di sistema mai risolti. Non ragionano, non
+esitano. Uccidono per istinto. Evitali — non puoi combatterli.
+
+GUARDIA IA  [Livello 1]
+------------------------
+Android da combattimento di ultima generazione. I loro occhi rossi
+riflettono la luce — tieniti nell'ombra. Non possono vederti, ma
+captano ogni suono, ogni vibrazione, ogni impulso neurale fuori
+dalla norma. Un passo falso è fatale.
+
+ADMIN — Singolarità  [Livello 0]
+---------------------------------
+L'amministratore di sistema. Un'entità senziente creata dalla
+NeoCorp per proteggere il Core. Legge i pattern del tuo pensiero.
+Conosce le tue paure. Non si può ingannare. Non si può combattere.
+Può solo essere aggirato — se sei abbastanza veloce.
 
 ================================================================================
 IL TUO INVENTARIO
 ================================================================================
 
-Sei equipaggiato con un "Neural Link" modificato che ti permette di:
-- Vedere la struttura della Matrix (minimap)
-- Manipolare oggetti nel cyberspace
-- Nasconderti nell'ombra dei dati
+Sei equipaggiato con un Neural Link modificato dalla Resistenza.
+Ti permette di:
 
-Ma hai anche una limitaizone critica: solo 90 secondi prima che
-il tuo corpo reale venga scoperto e disconnesso forcingly.
+- Visualizzare la struttura della Matrix  (minimappa in tempo reale)
+- Manipolare e spostare oggetti nel cyberspace
+- Nasconderti nell'ombra dei dati, mascherando la tua firma neurale
 
-================================================================================
-GLI UMANI FUORI DALLA MATRIX
-================================================================================
-
-Nel mondo reale, il Resistenza ti sta aiutando dall'esterno. Ma
-la NeoCorp ha trovato la loro base. Hai 90 minuti (virtuali) per
-completare la tua missione prima che ti disconnettano - per sempre.
+Limitazione critica: il tuo corpo fisico nel mondo reale è
+vulnerabile. Hai 90 minuti virtuali prima che la NeoCorp localizzi
+la tua posizione e ti disconnetta — definitivamente.
 
 ================================================================================
-CONTROLS
+GLI ALLEATI FUORI DALLA MATRIX
 ================================================================================
 
-W - Avanza
-S - Indietro
-A - Sinistra
-D - Destra
-Freccia Sinistra - Gira a sinistra
-Freccia Destra - Gira a destra
-ESC - Esci dalla Matrix (fine gioco)
+Nel mondo reale, la Resistenza ti monitora dall'esterno, guidandoti
+attraverso canali criptati. Ma la NeoCorp ha individuato la loro
+base. Quando cadrà l'ultimo firewall della Resistenza, il tuo
+collegamento verrà reciso — e tu rimarrai nel Matrix per sempre.
+
+Fai in fretta.
 
 ================================================================================
-COLLISIONE
+CONTROLLI
 ================================================================================
 
-Non toccare i muri - nel cyberspace, i muri sono dolorosi. Se ti
-scontri troppo, il tuo link neurale si instabilizza e muori.
+W              — Avanza
+S              — Indietro
+A              — Spostati a sinistra
+D              — Spostati a destra
+Freccia ←      — Gira a sinistra
+Freccia →      — Gira a destra
+ESC            — Disconnessione di emergenza (fine partita)
+
+================================================================================
+COLLISIONI
+================================================================================
+
+Nel cyberspace i muri non sono materia — sono codice attivo. Ogni
+collisione invia un impulso di ritorno attraverso il Neural Link,
+destabilizzando la tua connessione. Troppe collisioni e il link
+si interrompe. Non c'è respawn nel Matrix.
 
 ================================================================================
 LA DOMANDA FINALE
 ================================================================================
 
-Riesci a liberare l'umanità?
-O rimarrai per sempre intrappolato nel cyberspace, un altro
-fantasma nel sistema?
+Riuscirai a liberare l'umanità?
+
+O rimarrai per sempre intrappolato nel cyberspace —
+un altro fantasma nel sistema, dimenticato tra i server,
+in attesa di una cancellazione che non arriverà mai?
 
 ================================================================================
-                          BUONA FUGA.
+                            BUONA FUGA.
 ================================================================================
