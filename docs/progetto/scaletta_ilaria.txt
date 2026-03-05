@@ -1,0 +1,93 @@
+CUB3D - Proposta scaletta per Ilaria
+(stima ore per task, senza date fisse — le organizzi tu come vuoi)
+
+---
+
+I TUOI FILE:
+- src/events/events.c, keys.c
+- src/render/render.c, draw_walls.c, draw_floor_ceiling.c, textures.c
+- src/raycaster/raycaster.c, dda.c, player_move.c
+- BONUS: mouse_bonus.c, sprites_anim_bonus.c
+
+---
+
+STUDIO INIZIALE — circa 6-8 ore
+- leggere teoria_cub3D.txt
+- leggere tutorial Lodev (ray-casting + texture):
+  https://lodev.org/cgtutor/raycasting.html
+- capire il DDA su carta con un esempio
+- studiare come funziona mlx_get_data_addr e la scrittura pixel
+- provare il gioco originale: http://users.atw.hu/wolf3d/
+
+---
+
+SETUP MINILIBX + EVENTI — circa 4 ore
+- src/events/events.c:
+  mlx_init, mlx_new_window, mlx_loop
+  hook ESC e click X → chiude pulitamente
+- src/events/keys.c:
+  stato tasti (array booleano o flags)
+  hook key_press e key_release
+- src/render/render.c:
+  mlx_new_image + mlx_get_data_addr
+  funzione put_pixel(t_img, x, y, color)
+  mlx_put_image_to_window nel loop
+
+---
+
+RAY-CASTING DDA — circa 6-8 ore
+- src/raycaster/raycaster.c:
+  loop per ogni colonna x
+  calcolo cameraX, rayDirX, rayDirY
+- src/raycaster/dda.c:
+  implementazione DDA completa
+  calcolo perpWallDist, side
+
+---
+
+RENDERING MURI + MOVIMENTO — circa 6 ore
+- src/render/draw_walls.c:
+  lineHeight, drawStart, drawEnd
+  disegno colonna con colore solido (senza texture per ora)
+- src/render/draw_floor_ceiling.c:
+  riempimento colore uniforme F e C
+- src/raycaster/player_move.c:
+  movimento avanti/indietro (W/S) con collisioni
+  strafe sinistra/destra (A/D) con collisioni
+  rotazione (frecce) con matrice 2D
+
+---
+
+TEXTURE — circa 6-8 ore
+- src/render/textures.c:
+  caricamento XPM con mlx_xpm_file_to_image
+  calcolo texX (offset orizzontale nella texture)
+  calcolo texY (offset verticale, step per ogni pixel)
+  selezione texture corretta per lato (N/S/E/W)
+  applicazione texture ai muri
+
+---
+
+TEST + FIX — circa 4 ore
+- test con correction sheet (movimenti, texture, eventi)
+- fix bug
+- norminette sui tuoi file
+
+---
+
+BONUS — circa 4-6 ore (solo se il mandatory è perfetto)
+- src/bonus/mouse_bonus.c:
+  rotazione punto di vista con il mouse
+- src/bonus/sprites_anim_bonus.c:
+  sprite animati con frame multipli
+
+---
+
+README.md — circa 1-2 ore
+- prima riga corsivo con login1, login2
+- sezione Description, Instructions, Resources + uso AI
+
+---
+
+TOTALE STIMATO: circa 40-50 ore
+(da distribuire come preferisci)

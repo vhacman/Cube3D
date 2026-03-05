@@ -1,0 +1,198 @@
+================================================================
+        CUB3D - CORRECTION SHEET 2026 (aggiornata)
+        Trascrizione fedele per uso durante la difesa
+================================================================
+
+ALLEGATI DISPONIBILI:
+  - subject.pdf
+  - minilibx_macos_metal.tgz
+  - minilibx-linux.tgz
+  - minilibx_macos_opengl.tgz
+
+================================================================
+MANDATORY PART
+================================================================
+
+--- 1. README.md Compliance Check ---
+GRADE 0 SE MANCA ANCHE UN SOLO ELEMENTO.
+
+Il repository deve contenere un README.md alla root con:
+  [ ] Prima riga in corsivo:
+      "This project has been created as part of the 42 curriculum
+       by <login1>[, <login2>[, <login3>[...]]]."
+  [ ] Sezione "Description": scopo del progetto e panoramica
+  [ ] Sezione "Instructions": compilazione, installazione, esecuzione
+  [ ] Sezione "Resources": riferimenti (doc, tutorial, ecc.) +
+      spiegazione di come è stata usata l'AI (per quali task
+      e quali parti del progetto)
+
+  [ ] Yes  [ ] No
+
+--- 2. Executable name ---
+
+  [ ] `make` compila senza re-link
+  [ ] L'eseguibile si chiama esattamente `cub3D`
+  Se no → flag "Invalid compilation"
+
+  [ ] Yes  [ ] No
+
+--- 3. Configuration file ---
+
+Verificare che si possano configurare TUTTI questi elementi
+nel file .cub (formato come da subject):
+  [ ] NO  - percorso texture nord
+  [ ] EA  - percorso texture est
+  [ ] SO  - percorso texture sud
+  [ ] WE  - percorso texture ovest
+  [ ] F   - colore pavimento
+  [ ] C   - colore soffitto
+  [ ] mappa (vedi subject per dettagli)
+
+Verificare anche che il programma:
+  [ ] Restituisca errore e esca correttamente se il file è
+      mal configurato (chiave sconosciuta, chiave duplicata,
+      path non valido)
+  [ ] Restituisca errore se il filename non finisce con .cub
+
+  Se no → difesa terminata, flag "Incomplete work" o "Crash"
+
+  [ ] Yes  [ ] No
+
+--- 4. Technical elements of the display ---
+
+Se anche un solo test fallisce → 0 punti per questa sezione.
+
+  [ ] La finestra si apre al lancio del programma e rimane
+      aperta per tutta l'esecuzione
+  [ ] Un'immagine del labirinto è visibile nella finestra
+  [ ] Nascondere/minimizzare/massimizzare la finestra →
+      il contenuto rimane consistente
+
+  [ ] Yes  [ ] No
+
+--- 5. User basic events ---
+
+Se anche un solo test fallisce → 0 punti per questa sezione.
+
+  [ ] Click sulla X della finestra → chiude e termina pulitamente
+  [ ] Tasto ESC (o Q) → chiude e termina pulitamente
+  [ ] Premere i 4 tasti di movimento (WASD o ZQSD) →
+      ogni pressione produce un risultato visibile
+      (movimento o rotazione del giocatore)
+
+  [ ] Yes  [ ] No
+
+--- 6. Movements ---
+
+Se anche un solo test fallisce → 0 punti per questa sezione.
+
+  [ ] Orientamento spawn corretto per ogni cardinale (N, S, E, W)
+  [ ] Freccia sinistra → rotazione sinistra
+      Freccia destra → rotazione destra
+      (come se la testa del giocatore si muovesse)
+  [ ] W (o Z) → avanti in linea retta
+      S → indietro in linea retta
+  [ ] A (o Q) → strafe sinistra in linea retta
+      D → strafe destra in linea retta
+  [ ] Movimento fluido e "giocabile" (non lento)
+
+  [ ] Yes  [ ] No
+
+--- 7. Walls ---
+
+Se anche un solo test fallisce → 0 punti per questa sezione.
+
+  [ ] Texture muro diversa per ogni lato (N, S, E, W)
+  [ ] Texture e prospettiva visibilmente corrette
+  [ ] Modificare il path di una texture nel .cub →
+      la texture cambia quando il programma viene ri-eseguito
+  [ ] Path inesistente → errore
+  [ ] Colori F e C gestiti correttamente quando modificati nel .cub
+
+  [ ] Yes  [ ] No
+
+--- 8. Error management ---
+
+Se anche un solo test fallisce → 0 punti per questa sezione.
+
+  [ ] Argomenti casuali/multipli → nessun errore imprevisto
+  [ ] Nessun memory leak (verificare con `top` o `leaks`
+      in un altro terminale; la memoria non deve aumentare
+      con ogni azione)
+  [ ] Face/arm on keyboard (stress test) → nessun comportamento
+      strano, programma rimane funzionale
+  [ ] Mappa modificata → funziona se corretta, errore se no
+
+  [ ] Yes  [ ] No
+
+================================================================
+BONUS
+================================================================
+
+Valutati SOLO se il mandatory è PERFETTO (tutti i punti).
+Se il mandatory non ha tutti i punti → bonus completamente ignorati.
+
+"When I'll be older I'll be John Carmack"
+  → 1 punto per ogni bonus implementato e pienamente funzionale
+  → Valutazione da 0 (fallito) a 5 (eccellente)
+
+Bonus dalla lista del subject:
+  [ ] Wall collisions
+  [ ] Minimap system
+  [ ] Porte apribili e chiudibili
+  [ ] Sprite animati
+  [ ] Rotazione con il mouse
+
+================================================================
+RATINGS — Flag da usare
+================================================================
+
+Positivi:
+  [ ] Ok
+  [ ] Outstanding project
+
+Negativi:
+  [ ] Empty work
+  [ ] Incomplete work
+  [ ] Invalid compilation
+  [ ] Norme
+  [ ] Cheat
+  [ ] Crash
+  [ ] Incomplete group
+  [ ] Concerning situation
+  [ ] Leaks
+  [ ] Forbidden function
+  [ ] Can't support / explain code   ← NUOVO: non saper spiegare
+                                        il proprio codice = fail
+
+================================================================
+DIFFERENZE RISPETTO ALLA CORRECTION SHEET 2021
+================================================================
+
+RIMOSSO nella 2026:
+  - R (risoluzione finestra) → non più richiesta
+  - S (sprite texture) → non più nel config file
+  - --save (salvataggio BMP) → non più richiesto
+  - Sezione "Walls & Sprites" → ora solo "Walls" (no sprite)
+
+AGGIUNTO nella 2026:
+  - README.md compliance check → grade 0 se mancante
+  - Flag "Incomplete group"
+  - Flag "Concerning situation"
+  - Flag "Can't support / explain code"
+
+================================================================
+CONSIGLIO PER LA DIFESA
+================================================================
+
+Per il test memory leak su macOS, preparare in un terminale:
+  while true; do leaks cub3D; sleep 1; done
+Dimostra all'esaminatore che la memoria rimane piatta
+durante il movimento.
+
+Per evitare il flag "Can't explain code":
+  - Saper spiegare ogni funzione scritta
+  - Saper spiegare il DDA passo per passo
+  - Saper spiegare come funziona il texture mapping
+
+================================================================

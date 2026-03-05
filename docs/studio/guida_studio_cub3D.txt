@@ -1,0 +1,567 @@
+================================================================
+         CUB3D — GUIDA DI STUDIO APPROFONDITA
+         Da stampare e studiare prima di iniziare a scrivere codice
+================================================================
+
+Fonti principali:
+  - teoria_cub3D.txt (questo progetto)
+  - https://lodev.org/cgtutor/raycasting.html  ← LA fonte principale
+  - https://lodev.org/cgtutor/raycasting3.html ← per gli sprite
+  - https://harm-smits.github.io/42docs/libs/minilibx
+  - https://www.youtube.com/watch?v=NbSee-XM7WA ← video DDA visuale
+  - http://users.atw.hu/wolf3d/ ← gioco originale da provare
+
+Progetti 42 di riferimento (per ispirazione, NON copiare):
+  - https://github.com/mcombeau/cub3D
+  - https://github.com/gleal42/cub3d
+  - https://github.com/Sleleu/Cub3d
+
+Tester per il parser:
+  - https://github.com/MariaAguiar/cub3D_invalid_map_tester
+  - https://github.com/romslf/cub3d-tester
+
+================================================================
+PARTE 1 — COS'È IL RAY-CASTING
+================================================================
+
+Il ray-casting è una tecnica di rendering 3D che simula una
+vista in prima persona. NON è ray-tracing (molto più costoso).
+
+Idea di base:
+  - Lo schermo è diviso in colonne verticali di pixel
+  - Per ogni colonna, si "lancia" un raggio nella mappa 2D
+  - Il raggio trova il primo muro che colpisce
+  - La distanza al muro determina quanto alta disegnare la striscia
+    → vicino = striscia alta (muro grande)
+    → lontano = striscia bassa (muro piccolo)
+
+Questo crea l'illusione della profondità 3D.
+
+Perché funziona?
+  Nella realtà, gli oggetti lontani appaiono più piccoli.
+  La formula è: altezza_colonna = ALTEZZA_SCHERMO / distanza
+
+================================================================
+PARTE 2 — IL SISTEMA DI COORDINATE
+================================================================
+
+La mappa è una griglia 2D. Il giocatore ha:
+
+  posX, posY   → posizione nella mappa (numeri decimali)
+  dirX, dirY   → vettore di direzione (dove guarda)
+  planeX, planeY → piano della camera (larghezza del campo visivo)
+
+Il piano camera è PERPENDICOLARE alla direzione.
+La sua lunghezza determina il FOV (campo visivo).
+FOV tipico = 66° → |plane| = 0.66
+
+Esempio: giocatore che guarda a NORD (verso l'alto nella mappa)
+  dir   = (0, -1)    ← Y decresce andando verso nord
+  plane = (0.66, 0)  ← piano orizzontale
+
+Esempio: giocatore che guarda a EST (verso destra)
+  dir   = (1, 0)
+  plane = (0, 0.66)
+
+Tabella orientamenti iniziali:
+  N → dir=(0,-1)   plane=(0.66, 0)
+  S → dir=(0, 1)   plane=(-0.66, 0)
+  E → dir=(1, 0)   plane=(0, 0.66)
+  W → dir=(-1, 0)  plane=(0, -0.66)
+
+Per ogni colonna x dello schermo (da 0 a SCREEN_WIDTH-1):
+  cameraX = 2 * x / SCREEN_WIDTH - 1
+  → cameraX va da -1 (bordo sinistro) a +1 (bordo destro)
+
+  rayDirX = dirX + planeX * cameraX
+  rayDirY = dirY + planeY * cameraX
+  → questi sono i componenti del raggio per quella colonna
+
+================================================================
+PARTE 3 — L'ALGORITMO DDA (passo per passo)
+================================================================
+
+DDA = Digital Differential Analysis
+È l'algoritmo che trova quale cella della griglia il raggio
+colpisce per prima. È veloce perché salta di cella in cella.
+
+--- Intuizione visiva ---
+
+Immagina di camminare lungo il raggio.
+Ad ogni passo, puoi attraversare un bordo verticale (tra colonne)
+o un bordo orizzontale (tra righe).
+DDA sceglie sempre il bordo più vicino.
+
+--- Variabili ---
+
+mapX, mapY      = cella attuale (parte intera di posX, posY)
+deltaDistX      = quanto devo camminare lungo il raggio per
+                  attraversare una cella in direzione X
+deltaDistY      = stesso per Y
+sideDistX       = distanza al prossimo bordo verticale
+sideDistY       = distanza al prossimo bordo orizzontale
+stepX           = +1 se il raggio va a destra, -1 se va a sinistra
+stepY           = +1 se va in basso, -1 se va in alto
+side            = 0 se l'ultimo bordo attraversato era verticale
+                  1 se era orizzontale
+
+--- Calcolo di deltaDist ---
+
+deltaDistX = |1 / rayDirX|
+deltaDistY = |1 / rayDirY|
+
+Perché? Perché per percorrere 1 unità in X lungo il raggio,
+devo percorrere 1/rayDirX unità totali.
+
+--- Calcolo di sideDist e step ---
+
+Se rayDirX < 0 (raggio va a sinistra):
+  stepX = -1
+  sideDistX = (posX - mapX) * deltaDistX
+  → distanza al bordo sinistro della cella attuale
+
+Se rayDirX > 0 (raggio va a destra):
+  stepX = +1
+  sideDistX = (mapX + 1.0 - posX) * deltaDistX
+  → distanza al bordo destro della cella attuale
+
+(stesso ragionamento per Y)
+
+--- Il loop DDA ---
+
+Ripeti finché non trovi un muro:
+  Se sideDistX < sideDistY:
+    → il prossimo bordo è verticale
+    sideDistX += deltaDistX   (avanza al bordo verticale successivo)
+    mapX += stepX             (entra nella cella a destra/sinistra)
+    side = 0
+  Altrimenti:
+    → il prossimo bordo è orizzontale
+    sideDistY += deltaDistY
+    mapY += stepY
+    side = 1
+  Se map[mapX][mapY] == 1: MURO TROVATO, esci dal loop
+
+--- Distanza perpendicolare (FONDAMENTALE per evitare fish-eye) ---
+
+NON usare la distanza euclidea (sqrt((x2-x1)^2 + (y2-y1)^2))
+perché crea l'effetto fish-eye (i muri ai lati sembrano curvi).
+
+Usa la distanza PERPENDICOLARE al piano camera:
+
+  Se side == 0 (bordo verticale colpito):
+    perpWallDist = sideDistX - deltaDistX
+
+  Se side == 1 (bordo orizzontale colpito):
+    perpWallDist = sideDistY - deltaDistY
+
+Questa è la distanza proiettata sul piano camera, non la distanza
+reale. Elimina il fish-eye.
+
+================================================================
+PARTE 4 — RENDERING DEI MURI
+================================================================
+
+--- Altezza della colonna da disegnare ---
+
+lineHeight = (int)(SCREEN_HEIGHT / perpWallDist)
+
+drawStart = -lineHeight / 2 + SCREEN_HEIGHT / 2
+drawEnd   =  lineHeight / 2 + SCREEN_HEIGHT / 2
+
+Clamp (evita di uscire dallo schermo):
+  if (drawStart < 0): drawStart = 0
+  if (drawEnd >= SCREEN_HEIGHT): drawEnd = SCREEN_HEIGHT - 1
+
+--- Quale texture usare? ---
+
+Dipende da side e dalla direzione del raggio:
+
+  side == 0 e rayDirX > 0  → muro OVEST  (WE)
+  side == 0 e rayDirX < 0  → muro EST    (EA)
+  side == 1 e rayDirY > 0  → muro NORD   (NO)
+  side == 1 e rayDirY < 0  → muro SUD    (SO)
+
+Attenzione: la logica N/S/E/W dipende da come è orientata la mappa.
+Verifica sempre con un test visivo.
+
+--- Dove nella texture? (texX) ---
+
+Prima trova il punto esatto dove il raggio ha colpito il muro:
+
+  Se side == 0: wallX = posY + perpWallDist * rayDirY
+  Se side == 1: wallX = posX + perpWallDist * rayDirX
+
+  wallX -= floor(wallX)   ← prendi solo la parte decimale
+  → wallX è un valore tra 0 e 1 che indica la posizione nel muro
+
+  texX = (int)(wallX * TEX_WIDTH)
+
+Correzione orientamento (evita texture specchiate):
+  Se side == 0 e rayDirX > 0: texX = TEX_WIDTH - texX - 1
+  Se side == 1 e rayDirY < 0: texX = TEX_WIDTH - texX - 1
+
+--- Come scorrere la texture verticalmente (texY) ---
+
+La texture deve essere "stirata" o "compressa" per riempire
+la colonna. Si usa un passo (step):
+
+  step = (double)TEX_HEIGHT / lineHeight
+  texPos = (drawStart - SCREEN_HEIGHT / 2 + lineHeight / 2) * step
+
+Per ogni pixel y da drawStart a drawEnd:
+  texY = (int)texPos & (TEX_HEIGHT - 1)   ← & per evitare overflow
+  texPos += step
+  colore = leggi pixel dalla texture a (texX, texY)
+  disegna pixel a (x, y) sullo schermo
+
+================================================================
+PARTE 5 — FLOOR E CEILING
+================================================================
+
+--- Metodo semplice (obbligatorio nel subject) ---
+
+Per ogni colonna x:
+  - Pixel da 0 a drawStart-1 → colore soffitto (C)
+  - Pixel da drawEnd+1 a SCREEN_HEIGHT-1 → colore pavimento (F)
+
+In pratica, prima di disegnare i muri, riempi tutto lo schermo:
+  - Metà superiore con il colore del soffitto
+  - Metà inferiore con il colore del pavimento
+
+================================================================
+PARTE 6 — MOVIMENTO DEL GIOCATORE
+================================================================
+
+--- Avanti (W) ---
+
+moveSpeed = 0.05  (regola per velocità desiderata)
+
+Controlla collisione SEPARATAMENTE per X e Y:
+  Se map[(int)(posX + dirX * moveSpeed)][(int)posY] == 0:
+    posX += dirX * moveSpeed
+  Se map[(int)posX][(int)(posY + dirY * moveSpeed)] == 0:
+    posY += dirY * moveSpeed
+
+Perché separato? Così puoi "scivolare" lungo i muri invece
+di bloccarti completamente.
+
+--- Indietro (S) ---
+Stesso ma con segno negativo: posX -= dirX * moveSpeed
+
+--- Strafe sinistra (A) ---
+Il vettore perpendicolare alla direzione è (-dirY, dirX):
+  Se map[(int)(posX - dirY * moveSpeed)][(int)posY] == 0:
+    posX -= dirY * moveSpeed
+  Se map[(int)posX][(int)(posY + dirX * moveSpeed)] == 0:
+    posY += dirX * moveSpeed
+
+--- Strafe destra (D) ---
+Opposto dello strafe sinistra.
+
+--- Rotazione (frecce) ---
+
+Usa la matrice di rotazione 2D:
+  rotSpeed = 0.03
+
+  Per ruotare a DESTRA (angolo positivo):
+    oldDirX = dirX
+    dirX = dirX * cos(rotSpeed) - dirY * sin(rotSpeed)
+    dirY = oldDirX * sin(rotSpeed) + dirY * cos(rotSpeed)
+    oldPlaneX = planeX
+    planeX = planeX * cos(rotSpeed) - planeY * sin(rotSpeed)
+    planeY = oldPlaneX * sin(rotSpeed) + planeY * cos(rotSpeed)
+
+  Per ruotare a SINISTRA: usa -rotSpeed
+
+IMPORTANTE: ruota SEMPRE sia dir che plane insieme,
+altrimenti il FOV si deforma.
+
+================================================================
+PARTE 7 — MINILIBX IN PRATICA
+================================================================
+
+--- Inizializzazione ---
+
+  mlx = mlx_init();
+  win = mlx_new_window(mlx, SCREEN_WIDTH, SCREEN_HEIGHT, "cub3D");
+
+--- Immagine (MOLTO più veloce di mlx_pixel_put) ---
+
+  img.img = mlx_new_image(mlx, SCREEN_WIDTH, SCREEN_HEIGHT);
+  img.addr = mlx_get_data_addr(img.img, &img.bpp,
+                                &img.line_len, &img.endian);
+
+  // Scrivere un pixel:
+  void put_pixel(t_img *img, int x, int y, int color)
+  {
+    char *dst = img->addr + (y * img->line_len + x * (img->bpp / 8));
+    *(unsigned int *)dst = color;
+  }
+
+  // Mostrare l'immagine:
+  mlx_put_image_to_window(mlx, win, img.img, 0, 0);
+
+--- Caricare una texture XPM ---
+
+  tex.img = mlx_xpm_file_to_image(mlx, path, &tex.width, &tex.height);
+  tex.addr = mlx_get_data_addr(tex.img, &tex.bpp, &tex.line_len, &tex.endian);
+
+  // Leggere un pixel della texture:
+  int get_tex_pixel(t_img *tex, int x, int y)
+  {
+    char *src = tex->addr + (y * tex->line_len + x * (tex->bpp / 8));
+    return (*(int *)src);
+  }
+
+--- Hook eventi ---
+
+  // Tasto premuto
+  mlx_hook(win, 2, 1L<<0, key_press, &game);
+  // Tasto rilasciato (per movimento fluido)
+  mlx_hook(win, 3, 1L<<1, key_release, &game);
+  // Click sulla X della finestra
+  mlx_hook(win, 17, 0, close_window, &game);
+  // Funzione chiamata ogni frame
+  mlx_loop_hook(mlx, render_frame, &game);
+  // Avvia il loop
+  mlx_loop(mlx);
+
+--- Codici tasti (Linux) ---
+
+  ESC = 65307 | W = 119 | A = 97 | S = 115 | D = 100
+  Freccia SX = 65361 | Freccia DX = 65363
+  Freccia SU = 65362 | Freccia GIU = 65364
+
+--- Movimento fluido ---
+
+Per un movimento fluido, NON gestire il movimento direttamente
+nell'handler del tasto. Invece:
+  1. key_press → imposta un flag (es. game.keys.w = 1)
+  2. key_release → azzera il flag (game.keys.w = 0)
+  3. render_frame → controlla i flag e aggiorna la posizione
+
+================================================================
+PARTE 8 — PARSING DEL FILE .CUB
+================================================================
+
+--- Struttura del file ---
+
+  NO ./textures/north.xpm
+  SO ./textures/south.xpm
+  WE ./textures/west.xpm
+  EA ./textures/east.xpm
+  F 220,100,0
+  C 225,30,0
+
+  111111
+  100N01
+  111111
+
+--- Regole da rispettare ---
+
+  1. NO/SO/WE/EA/F/C possono essere in qualsiasi ordine
+  2. Possono esserci linee vuote tra gli elementi
+  3. La MAPPA deve essere SEMPRE l'ultimo elemento del file
+  4. Gli spazi sono validi nella mappa (non sono errori)
+  5. La mappa deve essere chiusa da muri su tutti i lati
+  6. Esattamente UN giocatore (N/S/E/W) deve essere presente
+  7. File non .cub → errore
+  8. Chiave sconosciuta → errore
+  9. Chiave duplicata → errore
+  10. Path texture inesistente → errore
+  11. Colori fuori range [0,255] → errore
+
+--- Errori comuni nel parser (da evitare) ---
+
+  - Accettare mappe con bordi aperti (mappa non chiusa)
+  - Non gestire le righe di lunghezza diversa nella mappa
+  - Non gestire gli spazi come caratteri validi nella mappa
+  - Non controllare che il path della texture esista davvero
+  - Non gestire il caso di più giocatori
+  - Non gestire il caso di nessun giocatore
+  - Crashare se il file è vuoto o ha solo linee vuote
+  - Non liberare la memoria in caso di errore
+
+--- Validazione mappa chiusa: flood-fill ---
+
+Algoritmo BFS/DFS dalla posizione del giocatore:
+  1. Crea una copia della mappa
+  2. Parti dalla posizione del giocatore
+  3. Espandi in tutte le direzioni (su/giù/sinistra/destra)
+  4. Se raggiungi il bordo della mappa → mappa aperta → errore
+  5. Se non riesci a uscire → mappa chiusa → ok
+
+Alternativa più semplice:
+  Controlla che ogni cella '0' non sia sul bordo della mappa
+  e che ogni cella '0' sia circondata solo da '0', '1', 'N/S/E/W'
+
+================================================================
+PARTE 9 — GESTIONE MEMORIA
+================================================================
+
+--- Regola d'oro ---
+
+Ogni malloc() deve avere il suo free() corrispondente.
+In caso di errore, libera TUTTO prima di uscire.
+
+--- Struttura consigliata ---
+
+Usa una struct principale che contiene tutto:
+
+  typedef struct s_game {
+    void      *mlx;
+    void      *win;
+    t_img     img;
+    t_player  player;
+    t_map     map;
+    t_img     textures[4];   // NO=0, SO=1, WE=2, EA=3
+    int       floor_color;
+    int       ceiling_color;
+  } t_game;
+
+Così puoi liberare tutto con una sola funzione:
+
+  void ft_free(t_game *g)
+  {
+    // libera mappa (array di stringhe)
+    // distruggi immagini mlx
+    // libera stringhe path texture
+    // ecc.
+  }
+
+--- Funzione di errore ---
+
+  void ft_error(t_game *g, char *msg)
+  {
+    ft_free(g);
+    write(2, "Error\n", 6);
+    write(2, msg, ft_strlen(msg));
+    write(2, "\n", 1);
+    exit(1);
+  }
+
+--- Cosa liberare ---
+
+  - map.grid (array di stringhe)
+  - path delle texture (stringhe)
+  - immagini mlx (mlx_destroy_image)
+  - finestra mlx (mlx_destroy_window)
+  - mlx stesso (mlx_destroy_display su Linux)
+
+================================================================
+PARTE 10 — COLORI
+================================================================
+
+I colori in miniLibX sono interi a 32 bit: 0x00RRGGBB
+
+  int create_color(int r, int g, int b)
+  {
+    return (r << 16 | g << 8 | b);
+  }
+
+Esempio:
+  rosso puro  = create_color(255, 0, 0)   = 0x00FF0000
+  verde puro  = create_color(0, 255, 0)   = 0x0000FF00
+  bianco      = create_color(255,255,255) = 0x00FFFFFF
+
+================================================================
+PARTE 11 — ERRORI COMUNI (da progetti 42 precedenti)
+================================================================
+
+PARSER:
+  - Non gestire le righe di lunghezza diversa nella mappa
+    → usa ft_strlen per ogni riga, non assumere larghezza fissa
+  - Non gestire gli spazi come caratteri validi
+    → gli spazi sono parte della mappa, non errori
+  - Accettare mappe con bordi aperti
+    → implementa flood-fill o check bordi
+  - Non controllare che il path esista prima di aprire la texture
+    → usa open() per verificare, poi close()
+
+RAYCASTING:
+  - Usare distanza euclidea invece di perpendicolare
+    → fish-eye effect, muri curvi ai lati
+  - Non ruotare il piano camera insieme alla direzione
+    → FOV si deforma durante la rotazione
+  - Dividere per zero se rayDirX o rayDirY == 0
+    → usa INFINITY o controlla prima
+
+RENDERING:
+  - Usare mlx_pixel_put invece di scrivere sull'immagine
+    → molto più lento, schermo lampeggia
+  - Non fare clamp di drawStart/drawEnd
+    → scrittura fuori dai limiti dell'immagine → crash
+
+MEMORIA:
+  - Non liberare la mappa in caso di errore nel parser
+  - Non distruggere le immagini mlx prima di uscire
+  - Fare free() su un puntatore NULL (ok in C, ma attenzione)
+  - Fare double free (liberare due volte lo stesso puntatore)
+
+EVENTI:
+  - Gestire il movimento direttamente nell'handler del tasto
+    → movimento a scatti, non fluido
+  - Non gestire key_release
+    → il giocatore continua a muoversi dopo aver rilasciato il tasto
+
+================================================================
+PARTE 12 — CHECKLIST PRIMA DELLA DIFESA
+================================================================
+
+  [ ] make compila senza errori e senza re-link
+  [ ] L'eseguibile si chiama esattamente "cub3D"
+  [ ] README.md presente con tutte le sezioni richieste
+  [ ] File .cub valido → programma funziona
+  [ ] File .cub con estensione sbagliata → errore
+  [ ] Chiave sconosciuta nel .cub → errore
+  [ ] Chiave duplicata nel .cub → errore
+  [ ] Path texture inesistente → errore
+  [ ] Colore fuori range → errore
+  [ ] Mappa aperta → errore
+  [ ] Nessun giocatore → errore
+  [ ] Più di un giocatore → errore
+  [ ] Finestra si apre e rimane aperta
+  [ ] Immagine del labirinto visibile
+  [ ] Minimize/maximize → contenuto consistente
+  [ ] ESC → chiude pulitamente
+  [ ] Click X → chiude pulitamente
+  [ ] W/A/S/D → movimento visibile
+  [ ] Orientamento spawn corretto (N/S/E/W)
+  [ ] Frecce → rotazione sinistra/destra
+  [ ] W/S → avanti/indietro in linea retta
+  [ ] A/D → strafe sinistra/destra in linea retta
+  [ ] Movimento fluido e giocabile
+  [ ] Texture diverse per N/S/E/W
+  [ ] Modificare path nel .cub → texture cambia
+  [ ] Colori F e C modificabili dal .cub
+  [ ] Argomenti casuali → nessun crash
+  [ ] Tastiera casuale → programma stabile
+  [ ] Mappa modificata → corretto o errore
+  [ ] Zero memory leak (verificato con valgrind/leaks)
+  [ ] Norminette su tutti i file
+
+================================================================
+RISORSE FINALI
+================================================================
+
+Tutorial principale (LEGGI TUTTO):
+  https://lodev.org/cgtutor/raycasting.html
+
+Sprite casting:
+  https://lodev.org/cgtutor/raycasting3.html
+
+MiniLibX docs:
+  https://harm-smits.github.io/42docs/libs/minilibx
+
+Video DDA visuale (5 minuti, molto chiaro):
+  https://www.youtube.com/watch?v=NbSee-XM7WA
+
+Gioco originale da provare:
+  http://users.atw.hu/wolf3d/
+
+Tester parser (da usare per verificare la robustezza):
+  https://github.com/MariaAguiar/cub3D_invalid_map_tester
+  https://github.com/romslf/cub3d-tester
+
+================================================================

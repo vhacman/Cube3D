@@ -1,0 +1,220 @@
+================================================================
+              REGOLE GIT PER UN FLUSSO DI LAVORO EFFICACE
+================================================================
+
+================================================================
+1. BRANCH — PRINCIPI BASE
+================================================================
+
+Regole fondamentali indipendentemente dalla struttura scelta:
+
+  - Non lavorare mai direttamente sul branch principale (main/master)
+  - Ogni persona o funzionalità ha il suo branch dedicato
+  - Il branch di integrazione (es. develop) raccoglie il lavoro
+    di tutti prima di andare in produzione/consegna
+  - Le modifiche vanno sul branch condiviso SOLO quando sono
+    complete e testate
+  - Chiedi sempre al team/prof come è strutturata la repo
+    prima di creare branch o fare merge
+
+================================================================
+2. COMMIT — COME E QUANDO
+================================================================
+
+Fai commit SPESSO, non aspettare di finire tutto.
+Un commit = un'unità logica di lavoro.
+
+--- Formato del messaggio ---
+
+Usa prefissi standard:
+  feat:   nuova funzionalità
+  fix:    correzione di un bug
+  wip:    lavoro in corso (work in progress)
+  refac:  refactoring senza cambiare comportamento
+  style:  formattazione, pulizia (nessun cambio logico)
+  docs:   aggiornamento documentazione/README
+  test:   aggiunta o modifica di test
+  chore:  task di manutenzione (Makefile, .gitignore, ecc.)
+
+Esempi:
+  git commit -m "feat: aggiunto modulo di parsing"
+  git commit -m "fix: corretto memory leak nella funzione free"
+  git commit -m "wip: algoritmo DDA a metà, da completare"
+  git commit -m "style: formattazione e pulizia codice"
+  git commit -m "refac: spostata logica errori in modulo dedicato"
+
+--- Regole per i messaggi ---
+
+  - Scrivi al presente imperativo: "aggiungi", non "aggiunto"
+    (oppure in inglese: "add", non "added")
+  - Sii specifico: "fix: corretto crash quando il file è vuoto"
+    è meglio di "fix: bug"
+  - Massimo ~72 caratteri per la prima riga
+  - Non usare "." alla fine
+
+================================================================
+3. AGGIORNAMENTO DEL BRANCH
+================================================================
+
+Prima di iniziare a lavorare, aggiorna SEMPRE il tuo branch:
+
+  git checkout <tuo-branch>
+  git pull origin <tuo-branch>   ← scarica le tue ultime modifiche
+  git merge develop               ← incorpora le novità di develop
+
+Questo evita conflitti grossi in seguito.
+
+================================================================
+4. MERGE SU DEVELOP
+================================================================
+
+Porta il tuo lavoro su develop SOLO quando:
+  - Il codice compila senza errori
+  - La funzionalità è testata
+  - Non ci sono problemi evidenti
+
+Procedura:
+  git checkout develop
+  git pull origin develop
+  git merge <tuo-branch>
+  git push origin develop
+  git checkout <tuo-branch>      ← torna al tuo branch
+
+================================================================
+5. GESTIONE DEI CONFLITTI
+================================================================
+
+Un conflitto succede quando due persone modificano la stessa
+parte dello stesso file. Git te lo segnala così:
+
+  <<<<<<< HEAD
+  (tuo codice)
+  =======
+  (codice dell'altro branch)
+  >>>>>>> develop
+
+Come risolverlo:
+  1. Apri il file con il conflitto
+  2. Decidi quale versione tenere (o combina le due)
+  3. Rimuovi i marcatori <<<, ===, >>>
+  4. git add <file>
+  5. git commit -m "fix: risolto conflitto in <nomefile>"
+
+Prevenzione: comunica con il partner prima di modificare
+gli stessi file.
+
+================================================================
+6. COSA NON FARE MAI
+================================================================
+
+  ✗ git push --force (su develop o main)
+    → sovrascrive la storia, distrugge il lavoro altrui
+
+  ✗ git commit -m "roba" o git commit -m "fix"
+    → messaggi inutili, impossibile capire cosa è cambiato
+
+  ✗ Lavorare direttamente su main o develop
+    → rischio di rompere il codice stabile
+
+  ✗ Fare commit di file compilati o generati automaticamente
+    → usa .gitignore per escluderli
+
+  ✗ Fare un unico commit gigante alla fine
+    → impossibile fare debug, impossibile tornare indietro
+
+  ✗ git add . senza controllare prima cosa si sta aggiungendo
+    → potresti committare file sbagliati
+
+================================================================
+7. .GITIGNORE — FILE DA NON COMMITTARE
+================================================================
+
+Crea un file .gitignore nella root del progetto con i file
+da escludere, ad esempio:
+
+  # File compilati e generati
+  *.o
+  *.class
+  *.pyc
+  build/
+  dist/
+  obj/
+
+  # Eseguibili
+  <nome-eseguibile>
+
+  # File di sistema
+  .DS_Store
+  Thumbs.db
+
+  # Editor e IDE
+  .vscode/
+  .idea/
+  *.swp
+  *~
+
+================================================================
+8. COMANDI ESSENZIALI
+================================================================
+
+Stato del repository:
+  git status                    ← cosa è modificato/staged
+  git diff                      ← differenze non staged
+  git diff --staged             ← differenze staged (pronte per commit)
+
+Storia:
+  git log --oneline             ← storia compatta
+  git log --oneline --graph     ← storia con grafico branch
+
+Branch:
+  git branch                    ← branch locali
+  git branch -a                 ← tutti i branch (anche remote)
+  git checkout <branch>         ← cambia branch
+  git checkout -b <nuovo>       ← crea e vai su nuovo branch
+
+Sincronizzazione:
+  git fetch origin              ← scarica aggiornamenti senza merge
+  git pull origin <branch>      ← fetch + merge
+  git push origin <branch>      ← carica sul remote
+
+Annullare:
+  git checkout -- <file>        ← annulla modifiche non staged
+  git reset HEAD <file>         ← rimuovi da staged (non perde modifiche)
+  git revert <hash>             ← annulla un commit (crea nuovo commit)
+
+================================================================
+9. FLUSSO COMPLETO IN SINTESI
+================================================================
+
+  OGNI GIORNO:
+  1. git checkout <tuo-branch>
+  2. git pull origin <tuo-branch>
+  3. git merge develop
+  4. (lavora)
+  5. git add <file>
+  6. git commit -m "tipo: descrizione"
+  7. git push origin <tuo-branch>
+
+  QUANDO UNA FEATURE È PRONTA:
+  8. git checkout develop
+  9. git pull origin develop
+  10. git merge <tuo-branch>
+  11. git push origin develop
+  12. git checkout <tuo-branch>
+
+  ALLA CONSEGNA FINALE:
+  13. git checkout main
+  14. git merge develop
+  15. git push origin main
+
+================================================================
+10. COMUNICAZIONE TRA PARTNER
+================================================================
+
+  - Dite sempre all'altro quando fate merge su develop
+  - Se modificate un file condiviso, avvisate prima
+  - Usate messaggi di commit chiari così l'altra capisce
+    cosa è cambiato senza dover leggere tutto il codice
+  - Fate test insieme prima di fare merge su develop
+
+================================================================

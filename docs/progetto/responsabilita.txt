@@ -1,0 +1,118 @@
+================================================================
+              CUB3D — RESPONSABILITÀ
+              Gabriela & Ilaria
+================================================================
+
+================================================================
+GABRIELA
+================================================================
+
+FILE DI MIA RESPONSABILITÀ:
+
+  include/
+    structs.h       → definizione di tutte le struct del progetto
+    defines.h       → costanti (dimensioni schermo, velocità, tasti)
+    cub3d.h         → header principale con tutti i prototipi
+
+  src/utils/
+    error.c         → ft_error(): stampa "Error\n" + msg, libera, esce
+    free.c          → ft_free(): libera tutta la memoria allocata
+    utils.c         → funzioni di utilità varie
+
+  src/parser/
+    parse_file.c    → apre il file .cub, controlla estensione,
+                      legge riga per riga, identifica gli elementi
+    parse_textures.c → parsing NO/SO/WE/EA, verifica path esistente,
+                       errore se chiave duplicata
+    parse_colors.c  → parsing F e C con RGB, validazione [0,255]
+    parse_map.c     → lettura griglia mappa, rilevamento posizione
+                      e orientamento giocatore (N/S/E/W)
+    validate_map.c  → validazione caratteri, controllo mappa chiusa
+                      (flood-fill o check bordi)
+
+  src/render/
+    sprites.c       → rendering sprite con Z-buffer, supporto multipli
+
+  Makefile          → già scritto
+
+  BONUS:
+    src/bonus/minimap_bonus.c    → mappa 2D in overlay
+    src/bonus/doors_bonus.c      → porte apribili e chiudibili
+
+  ASSET:
+    textures/       → trovare/creare 4 texture XPM (N/S/E/W)
+    maps/test.cub   → mappa di test valida e completa
+
+SEZIONI DELLA GUIDA DA STUDIARE:
+  - Parte 8: Parsing del file .cub
+  - Parte 9: Gestione memoria
+  - Parte 11: Errori comuni (sezione parser e memoria)
+  - Parte 12: Checklist pre-difesa (tutta)
+
+================================================================
+ILARIA
+================================================================
+
+FILE DI SUA RESPONSABILITÀ:
+
+  src/events/
+    events.c        → mlx_init, mlx_new_window, mlx_loop,
+                      hook ESC, click X, mlx_loop_hook
+    keys.c          → stato tasti (flag), hook key_press e key_release
+
+  src/render/
+    render.c        → game loop principale, mlx_new_image,
+                      mlx_get_data_addr, mlx_put_image_to_window
+    draw_walls.c    → calcolo lineHeight, drawStart, drawEnd,
+                      disegno colonne muri
+    draw_floor_ceiling.c → riempimento colore F e C
+    textures.c      → caricamento XPM, calcolo texX e texY,
+                      selezione texture per lato (N/S/E/W)
+
+  src/raycaster/
+    raycaster.c     → loop per ogni colonna x, calcolo cameraX,
+                      rayDirX, rayDirY
+    dda.c           → algoritmo DDA completo, calcolo perpWallDist
+    player_move.c   → movimento W/A/S/D con collisioni,
+                      rotazione con matrice 2D
+
+  README.md         → prima riga corsivo con login1 e login2,
+                      sezioni Description, Instructions, Resources + AI
+
+  BONUS:
+    src/bonus/mouse_bonus.c         → rotazione con il mouse
+    src/bonus/sprites_anim_bonus.c  → sprite animati
+
+SEZIONI DELLA GUIDA DA STUDIARE:
+  - Parte 2: Sistema di coordinate e vettori
+  - Parte 3: Algoritmo DDA
+  - Parte 4: Rendering dei muri
+  - Parte 6: Movimento del giocatore
+  - Parte 7: MiniLibX in pratica
+  - Parte 11: Errori comuni (sezione raycasting, rendering, eventi)
+
+================================================================
+FILE CONDIVISI (da coordinare insieme)
+================================================================
+
+  include/cub3d.h   → Gabriela scrive i prototipi man mano,
+                      Ilaria li usa → avvisarsi quando si aggiunge
+  include/structs.h → Gabriela definisce le struct,
+                      Ilaria le usa → avvisarsi se serve aggiungere campi
+  maps/test.cub     → Gabriela crea la mappa di test,
+                      Ilaria la usa per testare il rendering
+
+================================================================
+REGOLA DI COORDINAMENTO
+================================================================
+
+  - Quando Gabriela aggiunge una struct o un prototipo,
+    avvisa Ilaria così può usarli
+  - Quando Ilaria ha bisogno di un campo nella struct,
+    lo chiede a Gabriela
+  - Prima di fare merge su develop, testare insieme
+    che il codice compili e funzioni
+  - Usare il branch "gabriela" e "ilaria" separati,
+    merge su "develop" solo quando una parte è pronta
+
+================================================================

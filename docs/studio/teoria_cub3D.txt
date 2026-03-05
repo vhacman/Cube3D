@@ -1,0 +1,394 @@
+================================================================
+              CUB3D - TEORIA COMPLETA DA STUDIARE
+================================================================
+
+================================================================
+1. RAY-CASTING — CONCETTI BASE
+================================================================
+
+Il ray-casting e' una tecnica di rendering 3D che simula una
+vista in prima persona proiettando "raggi" dal punto di vista
+del giocatore verso la scena.
+
+NON e' ray-tracing (che e' molto piu' costoso).
+Il ray-casting funziona colonna per colonna di pixel.
+
+--- Come funziona ---
+
+Per ogni colonna di pixel dello schermo (es. 1920 colonne):
+  1. Si calcola la direzione del raggio corrispondente
+  2. Si lancia il raggio nella mappa 2D
+  3. Si trova il primo muro colpito
+  4. Si calcola la distanza dal giocatore al muro
+  5. Si disegna una striscia verticale proporzionale alla distanza
+     (piu' vicino = striscia piu' alta, piu' lontano = piu' bassa)
+
+--- Proiezione prospettica ---
+
+altezza_colonna = ALTEZZA_SCHERMO / distanza_perpendicolare
+
+La distanza PERPENDICOLARE (non euclidea) evita il fish-eye effect.
+
+================================================================
+2. SISTEMA DI COORDINATE E VETTORI
+================================================================
+
+Il giocatore ha:
+  - posizione: (posX, posY) — coordinate nella mappa
+  - direzione: (dirX, dirY) — vettore unitario di direzione
+  - piano camera: (planeX, planeY) — vettore perpendicolare alla dir
+
+Il piano camera determina il campo visivo (FOV).
+FOV tipico = 66 gradi → |plane| = 0.66 * |dir|
+
+Esempio orientamento NORD (guarda verso l'alto nella mappa):
+  dir   = (0, -1)
+  plane = (0.66, 0)
+
+Esempio orientamento EST (guarda verso destra):
+  dir   = (1, 0)
+  plane = (0, 0.66)
+
+--- Calcolo direzione raggio per colonna x ---
+
+cameraX = 2 * x / SCREEN_WIDTH - 1   // da -1 (sinistra) a +1 (destra)
+rayDirX = dirX + planeX * cameraX
+rayDirY = dirY + planeY * cameraX
+
+================================================================
+3. ALGORITMO DDA (Digital Differential Analysis)
+================================================================
+
+DDA e' l'algoritmo per trovare quale cella della griglia
+il raggio colpisce per prima.
+
+--- Variabili principali ---
+
+mapX, mapY      = cella corrente del giocatore (int)
+deltaDistX      = distanza tra due intersezioni verticali consecutive
+deltaDistY      = distanza tra due intersezioni orizzontali consecutive
+sideDistX       = distanza alla prima intersezione verticale
+sideDistY       = distanza alla prima intersezione orizzontale
+stepX, stepY    = direzione di avanzamento (+1 o -1)
+side            = 0 se colpito lato verticale (E/W), 1 se orizzontale (N/S)
+
+--- Calcolo deltaDist ---
+
+deltaDistX = |1 / rayDirX|   (o INFINITY se rayDirX == 0)
+deltaDistY = |1 / rayDirY|
+
+--- Calcolo sideDist e step ---
+
+if (rayDirX < 0):
+    stepX = -1
+    sideDistX = (posX - mapX) * deltaDistX
+else:
+    stepX = 1
+    sideDistX = (mapX + 1.0 - posX) * deltaDistX
+
+(stesso per Y)
+
+--- Loop DDA ---
+
+while (muro non trovato):
+    if (sideDistX < sideDistY):
+        sideDistX += deltaDistX
+        mapX += stepX
+        side = 0
+    else:
+        sideDistY += deltaDistY
+        mapY += stepY
+        side = 1
+    if (map[mapX][mapY] == 1): muro trovato!
+
+--- Distanza perpendicolare (correzione fish-eye) ---
+
+if (side == 0):
+    perpWallDist = sideDistX - deltaDistX
+else:
+    perpWallDist = sideDistY - deltaDistY
+
+================================================================
+4. RENDERING DEI MURI
+================================================================
+
+--- Altezza della colonna ---
+
+lineHeight = (int)(SCREEN_HEIGHT / perpWallDist)
+
+drawStart = -lineHeight / 2 + SCREEN_HEIGHT / 2
+drawEnd   =  lineHeight / 2 + SCREEN_HEIGHT / 2
+
+(con clamp a 0 e SCREEN_HEIGHT-1)
+
+--- Selezione texture in base al lato ---
+
+side == 0 e rayDirX > 0  → texture OVEST  (WE)
+side == 0 e rayDirX < 0  → texture EST    (EA)
+side == 1 e rayDirY > 0  → texture NORD   (NO)
+side == 1 e rayDirY < 0  → texture SUD    (SO)
+
+--- Calcolo offset X nella texture (texX) ---
+
+if (side == 0):
+    wallX = posY + perpWallDist * rayDirY
+else:
+    wallX = posX + perpWallDist * rayDirX
+
+wallX -= floor(wallX)   // parte frazionaria = posizione nel muro
+
+texX = (int)(wallX * TEX_WIDTH)
+
+// correzione orientamento texture
+if (side == 0 && rayDirX > 0): texX = TEX_WIDTH - texX - 1
+if (side == 1 && rayDirY < 0): texX = TEX_WIDTH - texX - 1
+
+--- Calcolo offset Y nella texture (texY) per ogni pixel ---
+
+step = 1.0 * TEX_HEIGHT / lineHeight
+texPos = (drawStart - SCREEN_HEIGHT / 2 + lineHeight / 2) * step
+
+for (y = drawStart; y < drawEnd; y++):
+    texY = (int)texPos & (TEX_HEIGHT - 1)
+    texPos += step
+    color = texture[texX][texY]
+    pixel[x][y] = color
+
+================================================================
+5. FLOOR & CEILING
+================================================================
+
+--- Metodo semplice (colore uniforme) ---
+
+Per ogni pixel sopra drawStart → colore soffitto (C)
+Per ogni pixel sotto drawEnd   → colore pavimento (F)
+
+--- Metodo avanzato (floor casting con texture) ---
+
+Per ogni riga y sotto il centro schermo:
+  rowDistance = posZ / (y - SCREEN_HEIGHT/2)   // posZ = 0.5 * SCREEN_HEIGHT
+  floorStepX = rowDistance * (rayDirX_right - rayDirX_left) / SCREEN_WIDTH
+  floorStepY = rowDistance * (rayDirY_right - rayDirY_left) / SCREEN_WIDTH
+  floorX = posX + rowDistance * rayDirX_left
+  floorY = posY + rowDistance * rayDirY_left
+
+  for (x = 0; x < SCREEN_WIDTH; x++):
+    cellX = (int)floorX
+    cellY = (int)floorY
+    texX = (int)(TEX_WIDTH * (floorX - cellX)) & (TEX_WIDTH - 1)
+    texY = (int)(TEX_HEIGHT * (floorY - cellY)) & (TEX_HEIGHT - 1)
+    color = floorTexture[texX][texY]
+    pixel[x][y] = color
+    pixel[x][SCREEN_HEIGHT - y - 1] = ceilingTexture[texX][texY]
+
+================================================================
+6. MOVIMENTO DEL GIOCATORE
+================================================================
+
+--- Avanti/Indietro (W/S) ---
+
+moveSpeed = 0.05  // regolabile
+
+if (W premuto):
+    if (map[posX + dirX * moveSpeed][posY] == 0): posX += dirX * moveSpeed
+    if (map[posX][posY + dirY * moveSpeed] == 0): posY += dirY * moveSpeed
+
+if (S premuto): stesso con segno negativo
+
+--- Rotazione (frecce sinistra/destra) ---
+
+rotSpeed = 0.03  // regolabile
+
+Rotazione con matrice 2D:
+  oldDirX = dirX
+  dirX = dirX * cos(-rotSpeed) - dirY * sin(-rotSpeed)
+  dirY = oldDirX * sin(-rotSpeed) + dirY * cos(-rotSpeed)
+  oldPlaneX = planeX
+  planeX = planeX * cos(-rotSpeed) - planeY * sin(-rotSpeed)
+  planeY = oldPlaneX * sin(-rotSpeed) + planeY * cos(-rotSpeed)
+
+(segno negativo per sinistra, positivo per destra)
+
+--- Strafe (A/D) ---
+
+Stesso del movimento avanti/indietro ma usando il vettore
+perpendicolare alla direzione:
+  strafeX = -dirY
+  strafeY =  dirX
+
+================================================================
+7. MINILIBX — FUNZIONI PRINCIPALI
+================================================================
+
+--- Inizializzazione ---
+
+void *mlx_ptr = mlx_init();
+void *win_ptr = mlx_new_window(mlx_ptr, WIDTH, HEIGHT, "cub3D");
+
+--- Immagine (piu' efficiente di mlx_pixel_put) ---
+
+void *img = mlx_new_image(mlx_ptr, WIDTH, HEIGHT);
+char *addr = mlx_get_data_addr(img, &bits_per_pixel, &line_length, &endian);
+
+// Scrivere un pixel:
+int offset = (y * line_length + x * (bits_per_pixel / 8));
+*(unsigned int *)(addr + offset) = color;
+
+// Mettere l'immagine nella finestra:
+mlx_put_image_to_window(mlx_ptr, win_ptr, img, 0, 0);
+
+--- Caricare una texture XPM ---
+
+void *tex_img = mlx_xpm_file_to_image(mlx_ptr, "path.xpm", &width, &height);
+char *tex_addr = mlx_get_data_addr(tex_img, &bpp, &ll, &endian);
+
+// Leggere un pixel della texture:
+int color = *(int *)(tex_addr + (texY * ll + texX * (bpp / 8)));
+
+--- Hook eventi ---
+
+mlx_hook(win_ptr, 2, 1L<<0, key_press_handler, &game);   // KeyPress
+mlx_hook(win_ptr, 17, 0, close_handler, &game);           // DestroyNotify (X)
+mlx_loop_hook(mlx_ptr, render_frame, &game);              // ogni frame
+mlx_loop(mlx_ptr);
+
+--- Codici tasti comuni ---
+
+ESC         = 65307
+W           = 119
+A           = 97
+S           = 115
+D           = 100
+Freccia SX  = 65361
+Freccia DX  = 65363
+Freccia SU  = 65362
+Freccia GIU = 65364
+
+================================================================
+8. PARSING DEL FILE .CUB
+================================================================
+
+--- Struttura del file ---
+
+NO ./textures/north.xpm
+SO ./textures/south.xpm
+WE ./textures/west.xpm
+EA ./textures/east.xpm
+F 220,100,0
+C 225,30,0
+
+111111
+100N01
+111111
+
+--- Regole di parsing ---
+
+1. Ogni elemento (NO/SO/WE/EA/F/C) puo' essere in qualsiasi ordine
+2. Possono esserci linee vuote tra gli elementi
+3. La MAPPA deve essere SEMPRE l'ultimo elemento
+4. Gli spazi sono validi nella mappa
+5. La mappa deve essere chiusa da muri (1) su tutti i lati
+6. Un solo giocatore (N/S/E/W) deve essere presente
+7. Se il file non finisce con .cub → errore
+8. Chiavi sconosciute o duplicate → errore
+9. Path texture inesistente → errore
+10. Colori fuori range [0,255] → errore
+
+--- Validazione mappa chiusa ---
+
+Algoritmo flood-fill (BFS/DFS) dalla posizione del giocatore:
+  - Se si raggiunge il bordo della mappa → mappa non chiusa → errore
+  - Oppure: controllare che ogni 0 adiacente a un bordo sia un 1
+
+================================================================
+9. GESTIONE MEMORIA E ERRORI
+================================================================
+
+--- Regole fondamentali ---
+
+- Ogni malloc deve avere il suo free corrispondente
+- In caso di errore: liberare TUTTA la memoria allocata fino a quel punto
+- Usare una struct principale (t_game) che contiene tutto,
+  cosi' e' facile liberare tutto con una funzione ft_free(&game)
+
+--- Struttura consigliata ---
+
+typedef struct s_game {
+    void        *mlx;
+    void        *win;
+    t_img       img;
+    t_player    player;
+    t_map       map;
+    t_texture   textures[4];  // NO, SO, WE, EA
+    int         floor_color;
+    int         ceiling_color;
+}   t_game;
+
+--- Uscita con errore ---
+
+void    error_exit(t_game *game, char *msg)
+{
+    ft_free(game);
+    ft_putstr_fd("Error\n", 2);
+    ft_putstr_fd(msg, 2);
+    ft_putstr_fd("\n", 2);
+    exit(1);
+}
+
+================================================================
+10. COLORI IN MINILIBX
+================================================================
+
+I colori sono interi a 32 bit nel formato: 0x00RRGGBB
+
+int create_color(int r, int g, int b)
+{
+    return (r << 16 | g << 8 | b);
+}
+
+================================================================
+11. ORIENTAMENTO INIZIALE DEL GIOCATORE
+================================================================
+
+Carattere nella mappa → direzione iniziale:
+
+N → dirX = 0,  dirY = -1,  planeX = 0.66,  planeY = 0
+S → dirX = 0,  dirY = 1,   planeX = -0.66, planeY = 0
+E → dirX = 1,  dirY = 0,   planeX = 0,     planeY = 0.66
+W → dirX = -1, dirY = 0,   planeX = 0,     planeY = -0.66
+
+================================================================
+12. SPRITE RENDERING (Z-BUFFER)
+================================================================
+
+Per renderizzare gli sprite correttamente davanti/dietro i muri:
+
+1. Calcolare distanza di ogni sprite dal giocatore
+2. Ordinare gli sprite per distanza (dal piu' lontano al piu' vicino)
+3. Per ogni sprite:
+   a. Calcolare posizione relativa al giocatore
+   b. Trasformare con la matrice inversa della camera
+   c. Calcolare posizione sullo schermo
+   d. Disegnare solo i pixel non coperti da muri piu' vicini
+      (usando lo Z-buffer: array con distanza del muro per ogni colonna)
+
+================================================================
+13. RISORSE UTILI
+================================================================
+
+- Lodev Ray-Casting Tutorial (LA piu' importante):
+  https://lodev.org/cgtutor/raycasting.html
+
+- Lodev Sprite Casting:
+  https://lodev.org/cgtutor/raycasting3.html
+
+- MiniLibX documentation:
+  https://harm-smits.github.io/42docs/libs/minilibx
+
+- Wolfenstein 3D originale (per capire il risultato atteso):
+  http://users.atw.hu/wolf3d/
+
+- Spiegazione visuale del DDA:
+  https://www.youtube.com/watch?v=NbSee-XM7WA
+
+================================================================
