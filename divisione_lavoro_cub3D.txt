@@ -1,0 +1,176 @@
+================================================================
+                  CUB3D - DIVISIONE DEL LAVORO
+              Progetto 42 | Due persone | v12.0
+     (Aggiornato in base alla Correction Sheet ufficiale)
+================================================================
+
+Ogni persona lavora su parti di parsing, matematica, grafica
+e setup, cosi' entrambi acquisiscono competenze complete.
+
+================================================================
+PERSONA 1
+================================================================
+
+--- DIFFICILE ---
+
+[Ray-Casting] Algoritmo DDA
+  - Calcolo direzione del raggio per ogni colonna di pixel
+  - Algoritmo DDA per rilevare collisioni con i muri
+  - Calcolo distanza corretta (correzione fish-eye)
+  - Determinazione lato colpito (N/S o E/W)
+  >> CORRECTION: movimento fluido e "giocabile" richiesto
+
+--- MEDIO ---
+
+[Parser] File .cub — elementi di configurazione
+  - Lettura e validazione: NO, SO, WE, EA, F, C
+  - Parsing colori RGB (range 0-255) per F e C
+  - Gestione errori: "Error\n" + messaggio esplicativo
+  - Errore se estensione file non e' .cub
+  - Errore se chiave sconosciuta o chiave duplicata
+  - Errore se path texture non esiste
+  >> CORRECTION: verifica che modificare path nel .cub cambi
+     la texture a runtime; path inesistente deve dare errore
+
+[Rendering] Floor & Ceiling
+  - Riempimento colore uniforme pavimento (F R,G,B)
+  - Riempimento colore uniforme soffitto (C R,G,B)
+  >> CORRECTION: colori devono cambiare modificando il .cub
+
+--- FACILE ---
+
+[Setup] Makefile
+  - Regole: $(NAME), all, clean, fclean, re, bonus
+  - Compilazione: cc -Wall -Wextra -Werror
+  - Nessun relinking inutile
+  >> CORRECTION: `make` deve compilare senza re-link,
+     eseguibile deve chiamarsi esattamente `cub3D`
+
+[Error Management] Robustezza generale
+  - Nessun crash con argomenti casuali o errati
+  - Nessun memory leak (verificabile con `top` o `leaks`)
+  - Input tastiera casuale (face-on-keyboard) → programma stabile
+  >> CORRECTION: memory leak = 0 punti; crash = 0 punti
+
+[Bonus] Minimap system
+  - Visualizzazione mappa in overlay sulla finestra
+
+================================================================
+PERSONA 2
+================================================================
+
+--- DIFFICILE ---
+
+[Ray-Casting] Texture Mapping + Sprite
+  - Caricamento XPM con mlx_xpm_file_to_image
+  - Selezione texture corretta per lato (N/S/E/W)
+  - Calcolo offset orizzontale (texX) e verticale (texY)
+  - Applicazione colore pixel per pixel
+  - Sprite: visualizzazione corretta, supporto multipli sprite
+  >> CORRECTION: texture N/S/E/W devono essere visibilmente
+     diverse e corrette; sprite deve funzionare piu' volte
+
+--- MEDIO ---
+
+[Parser] Mappa
+  - Lettura griglia (ultimo elemento del file .cub)
+  - Validazione caratteri: 0, 1, N, S, E, W, spazi
+  - Controllo mappa chiusa da muri (1)
+  - Rilevamento posizione e orientamento iniziale giocatore
+  >> CORRECTION: orientamento spawn (N/S/E/W) deve corrispondere
+     esattamente a quanto scritto nel .cub
+
+[Rendering] Muri + Movimento giocatore
+  - Calcolo altezza colonna per ogni raggio
+  - Proiezione 3D: colonne verticali proporzionali alla distanza
+  - Aggiornamento posizione con W/A/S/D
+  - Rotazione con frecce sinistra/destra
+  - Strafe sinistra/destra con A/D (o Q/D)
+  - Collisioni base con i muri
+  >> CORRECTION: tutti e 4 i movimenti devono dare risultato
+     visibile; strafe e rotazione devono essere distinti
+
+--- FACILE ---
+
+[Setup] Inizializzazione miniLibX + Gestione eventi + Finestra
+  - Apertura finestra, creazione immagine
+  - Hook: ESC (o Q), click X finestra, tastiera
+  - Finestra rimane aperta per tutta l'esecuzione
+  - Contenuto finestra consistente dopo minimize/maximize
+  - Strutture dati principali: t_map, t_player, t_game, t_texture
+  >> CORRECTION: click X e ESC devono chiudere pulitamente;
+     finestra deve restare consistente dopo minimize/maximize
+
+[Documentazione] README.md
+  - Prima riga corsivo: "This project has been created as part
+    of the 42 curriculum by <login1>, <login2>."
+  - Sezione Description, Instructions, Resources + uso AI
+
+[Bonus] Porte apribili e chiudibili
+
+================================================================
+BONUS (solo se mandatory e' PERFETTO — tutti i punti)
+================================================================
+
+Persona 1:
+  - Minimap system (gia' assegnato sopra)
+  - Porte apribili e chiudibili (supporto a Persona 2)
+
+Persona 2:
+  - Sprite animati
+  - Rotazione punto di vista con il mouse
+
+Entrambi:
+  - Wall collisions avanzate
+
+================================================================
+RIEPILOGO BILANCIAMENTO
+================================================================
+
+              | Persona 1              | Persona 2
+  ------------|------------------------|------------------------
+  DIFFICILE   | DDA ray-casting        | Texture mapping+sprite
+  MEDIO       | Parser .cub + F/C      | Parser mappa + Muri/Mov
+  FACILE      | Makefile + Error mgmt  | Init mlx + eventi + win
+              | Bonus minimap          | README.md + bonus porte
+
+Entrambi toccano: parsing, matematica/grafica, setup, bonus.
+
+================================================================
+CHECKLIST CORRECTION SHEET — cosa NON dimenticare
+================================================================
+
+[ ] Eseguibile si chiama esattamente "cub3D"
+[ ] make non fa re-link inutile
+[ ] Errore se file non ha estensione .cub
+[ ] Errore se chiave sconosciuta o duplicata nel .cub
+[ ] Errore se path texture non esiste
+[ ] Orientamento spawn (N/S/E/W) corretto al primo frame
+[ ] Rotazione sinistra/destra con frecce (o A/D)
+[ ] Movimento avanti/indietro con frecce (o W/S)
+[ ] Strafe sinistra/destra con A/D (o Q/D) — distinto dalla rotazione
+[ ] Movimento fluido e giocabile
+[ ] Texture diverse per N/S/E/W visibilmente corrette
+[ ] Modificare path nel .cub cambia texture a runtime
+[ ] Sprite visualizzato correttamente, anche multipli
+[ ] Colori F e C modificabili dal .cub
+[ ] Click X finestra → chiude pulitamente
+[ ] ESC (o Q) → chiude pulitamente
+[ ] Finestra consistente dopo minimize/maximize
+[ ] Nessun crash con argomenti casuali
+[ ] Nessun memory leak
+[ ] Input tastiera casuale → programma stabile
+[ ] Mappa modificata → comportamento corretto o errore
+
+================================================================
+NOTE GENERALI
+================================================================
+
+- Linguaggio: C, conforme alla Norm 42
+- Nessun memory leak, nessun crash (= 0 punti immediato)
+- Librerie: miniLibX, math (-lm), libft (opzionale)
+- Funzioni esterne: open, close, read, write, printf, malloc,
+  free, perror, strerror, exit, gettimeofday
+- Consegna: repository Git
+
+================================================================
