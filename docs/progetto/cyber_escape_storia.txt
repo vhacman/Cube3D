@@ -1,0 +1,154 @@
+================================================================================
+                         CYBER ESCAPE
+                    La Fuga dalla Matrix
+================================================================================
+
+ANNO: 2147
+
+================================================================================
+PROLOGO
+================================================================================
+
+Il mondo non è più quello che conosci. Nel 2089, la NeoCorp ha completato
+il progetto "MATRIX" - una rete neurale globale che connette direttamente
+la mente umana a un cyberspace condiviso. Miliardi di persone vivono
+ora in uno stato di ibernazione, le loro menti intrappolate in una
+simulazione perfetta della realtà.
+
+Tu sei uno dei pochi "Risvegliati" - individui che hanno trovato il modo
+di liberarsi dalla Matrix e tornare alla realtà. Ma la NeoCorp non lo
+sa... ancora.
+
+================================================================================
+LA MISSIONE
+================================================================================
+
+Sei intrappolato nel Sottolivello 7 della NeoCorp - un labirinto virtuale
+creato per intrappolare i Risvegliati come te. Ogni piano è protetto da
+firewall, guardie IA e sistemi di sicurezza sempre più avanzati.
+
+Il tuo obiettivo: raggiungere il Piano Zero - il nucleo centrale dove
+si trova il generatore principale della Matrix - e distruggerlo per
+liberare l'umanità.
+
+Ma attento: la NeoCorp sa che sei lì dentro. I loro admin virtuali ti
+stanno cacciando.
+
+================================================================================
+IL LABIRINTO
+================================================================================
+
+Livello 7: "THE DUNGEON"
+------------------------
+La prima linea di difesa. Muri di dati criptati, corridoi bui,
+sensori di movimento ovunque. Qui i nuovi prigionieri vengono "processati"
+e inseriti nella simulazione.
+
+Livello 6: "DATA FOREST"
+------------------------
+Una foresta di codice binario. Alberi fatti di stringhe, fiumi di dati.
+Le ombre qui ti seguono - sono i dati residui di menti cancellate.
+
+Livello 5: "NEON CITY"
+----------------------
+Una città cyberpunk abbandonata. Edifici altissimi, insegne al neon
+sfuse, streets deserte. Qualcosa si muove nell'ombra...
+
+Livello 4: "THE INDUSTRY"
+-------------------------
+Fabbriche automatizzate che producono olocone. Rumore assordante,
+ vapore tossico, macchinari mortali. I robot non ti vedono, ma se
+ti sentono...
+
+Livello 3: "SERVER FARM"
+------------------------
+Il cuore pulsante del sistema. Miliardi di server allineati come
+cassefunerarie. Il calore è insopportabile. Qui il firewall è
+vivo - unareatura di protezione che cerca intrusi.
+
+Livello 2: "ADMINISTRATIVE ZONE"
+-------------------------------
+Uffici vuoti, archivi, archivi. Qui lavoravano gli umani prima che
+la NeoCorp li sostituisse con IA. I fantasmi dei dipendenti ancora
+passeggiano nei corridoi...
+
+Livello 1: "SECURITY HUB"
+------------------------
+Il quartier generale della sicurezza NeoCorp. Qui stanno le IA
+più pericolose - gli Admin di sistema. Hai una sola possibilità.
+
+Livello 0: "THE CORE"
+---------------------
+Il nucleo. Una sfera di pura energia luminosa - il cuore della
+Matrix. Se la distruggi, tutto crollerà. Ma sarai ancora vivo per
+vederlo?
+
+================================================================================
+I NEMICI
+================================================================================
+
+GLITCH
+------
+Frammenti di codice corrotto. Appaiono e scompaiono. Non pensano,
+ma uccidono.
+
+GUARDIA IA
+-----------
+Android da combattimento. Rifletti la luce sui loro occhi rossi.
+Non possono vederti, ma ti sentono.
+
+ADMIN (Singolarità)
+-------------------
+Gli admin di sistema. Entità senzienti create dalla NeoCorp per
+mantenere l'ordine. Leggono i tuoi pensieri. Conoscono le tue paure.
+
+================================================================================
+IL TUO INVENTARIO
+================================================================================
+
+Sei equipaggiato con un "Neural Link" modificato che ti permette di:
+- Vedere la struttura della Matrix (minimap)
+- Manipolare oggetti nel cyberspace
+- Nasconderti nell'ombra dei dati
+
+Ma hai anche una limitaizone critica: solo 90 secondi prima che
+il tuo corpo reale venga scoperto e disconnesso forcingly.
+
+================================================================================
+GLI UMANI FUORI DALLA MATRIX
+================================================================================
+
+Nel mondo reale, il Resistenza ti sta aiutando dall'esterno. Ma
+la NeoCorp ha trovato la loro base. Hai 90 minuti (virtuali) per
+completare la tua missione prima che ti disconnettano - per sempre.
+
+================================================================================
+CONTROLS
+================================================================================
+
+W - Avanza
+S - Indietro
+A - Sinistra
+D - Destra
+Freccia Sinistra - Gira a sinistra
+Freccia Destra - Gira a destra
+ESC - Esci dalla Matrix (fine gioco)
+
+================================================================================
+COLLISIONE
+================================================================================
+
+Non toccare i muri - nel cyberspace, i muri sono dolorosi. Se ti
+scontri troppo, il tuo link neurale si instabilizza e muori.
+
+================================================================================
+LA DOMANDA FINALE
+================================================================================
+
+Riesci a liberare l'umanità?
+O rimarrai per sempre intrappolato nel cyberspace, un altro
+fantasma nel sistema?
+
+================================================================================
+                          BUONA FUGA.
+================================================================================
