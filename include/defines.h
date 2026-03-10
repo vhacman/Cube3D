@@ -2,6 +2,8 @@
 #ifndef DEFINES_H
 # define DEFINES_H
 
+# include <math.h>
+
 /* RISOLUZIONE SCHERMO */
 
 /*

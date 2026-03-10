@@ -183,21 +183,19 @@ int		key_release(int keycode, t_game *game);
  * FUNZIONI DI UTILITA
  */
 
-/*
- * Stampa errore e esci
- * Parametri: puntatore a t_game (puo essere NULL), messaggio di errore
- * Cosa fa: stampa Error su stderr, stampa messaggio, libera memoria, esce con exit(1)
- * File: src/utils/error.c
+/* Libera un array di stringhe
+ * Parametri: array di stringhe (char **)
+ * Cosa fa: libera ogni stringa e l'array stesso
+ * File: src/utils/utils.c
  */
-void	error_exit(t_game *game, char *message);
+void	free_str_array(char **arr);
 
-/*
- * Libera tutta la memoria
- * Parametri: puntatore a t_game
- * Cosa fa: libera mappa, path texture, immagini, finestra, mlx
- * File: src/utils/free.c
+/* Libera un puntatore e lo imposta a NULL
+ * Parametri: puntatore a puntatore (void**)
+ * Cosa fa: libera e imposta a NULL per prevenire use-after-free
+ * File: src/utils/utils.c
  */
-void	free_game(t_game *game);
+void	safe_free(void **ptr);
 
 /*
  * Crea un colore

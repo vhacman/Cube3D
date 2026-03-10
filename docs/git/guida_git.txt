@@ -30,6 +30,7 @@ PRIMA VOLTA — SETUP INIZIALE (da fare una volta sola)
 
 4. Ilaria: vai sul tuo branch
    git checkout ilaria
+   git switch ilaria 
 
 ================================================================
 FLUSSO DI LAVORO QUOTIDIANO

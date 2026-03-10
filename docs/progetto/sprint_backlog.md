@@ -100,43 +100,123 @@
 
 ---
 
-## Prossimi Sprint: Implementazione
+## Sprint 8: Rendering ✅ COMPLETATO (10 Marzo 2026)
 
-### Sprint 6: Parser (.cub file)
-**Assegnato a:** Gabriela
+### Obiettivi
+- [x] MiniLibX init
+- [x] Game loop
+- [x] Image rendering
+- [x] Double buffering
 
+### Task Completati
+
+| ID | Task | Assegnato a | Status |
+|----|------|-------------|--------|
+| S8.1 | Implementare init_mlx() in events.c | Ilaria | ✅ |
+| S8.2 | Implementare create_window() in events.c | Ilaria | ✅ |
+| S8.3 | Implementare init_image() in render.c | Ilaria | ✅ |
+| S8.4 | Implementare my_mlx_pixel_put() in render.c | Ilaria | ✅ |
+| S8.5 | Implementare clear_image() in render.c | Ilaria | ✅ |
+| S8.6 | Implementare render() in render.c | Ilaria | ✅ |
+
+---
+
+## Sprint 9: Eventi ✅ COMPLETATO (10 Marzo 2026)
+
+### Obiettivi
+- [x] Keyboard input (WASD, frecce)
+- [x] Window close (ESC, X rosso)
+- [ ] Mouse events (optional)
+
+### Task Completati
+
+| ID | Task | Assegnato a | Status |
+|----|------|-------------|--------|
+| S9.1 | Implementare setup_hooks() in events.c | Ilaria | ✅ |
+| S9.2 | Implementare start_loop() in events.c | Ilaria | ✅ |
+| S9.3 | Implementare close_window() in events.c | Ilaria | ✅ |
+| S9.4 | Implementare init_keys() in keys.c | Ilaria | ✅ |
+| S9.5 | Implementare key_press() in keys.c | Ilaria | ✅ |
+| S9.6 | Implementare key_release() in keys.c | Ilaria | ✅ |
+
+---
+
+## Sprint Utils: Utility Functions ✅ COMPLETATO (10 Marzo 2026)
+
+### Obiettivi
+- [x] Gestione errori
+- [x] Memory freeing
+- [x] Funzioni utili generiche
+
+### Task Completati
+
+| ID | Task | Assegnato a | Status |
+|----|------|-------------|--------|
+| U1 | Implementare error_exit() in error.c | Ilaria | ✅ |
+| U2 | Implementare free_map() in free.c | Ilaria | ✅ |
+| U3 | Implementare free_textures() in free.c | Ilaria | ✅ |
+| U4 | Implementare free_main_image() in free.c | Ilaria | ✅ |
+| U5 | Implementare free_game() in free.c | Ilaria | ✅ |
+| U6 | Implementare free_str_array() in utils.c | Ilaria | ✅ |
+| U7 | Implementare safe_free() in utils.c | Ilaria | ✅ |
+| U8 | Implementare create_color() in utils.c | Ilaria | ✅ |
+
+---
+
+## Sprint 7: Raycasting Engine 🚧 IN CORSO
+
+### Obiettivi
+- [ ] Implementare DDA algorithm
+- [ ] Calcolo distanza muri
+- [ ] Textures sui muri
+- [ ] Floor/Ceiling colors
+- [x] Movimento giocatore (player_move.c)
+
+### Task Completati
+
+| ID | Task | Assegnato a | Status |
+|----|------|-------------|--------|
+| S7.1 | Implementare is_walkable() in player_move.c | Ilaria | ✅ |
+| S7.2 | Implementare rotate_player() in player_move.c | Ilaria | ✅ |
+| S7.3 | Implementare move_forward_back() in player_move.c | Ilaria | ✅ |
+| S7.4 | Implementare move_strafe() in player_move.c | Ilaria | ✅ |
+| S7.5 | Implementare move_player() in player_move.c | Ilaria | ✅ |
+
+### Task Da Completare
+
+| ID | Task | Assegnato a | Status |
+|----|------|-------------|--------|
+| S7.6 | Implementare DDA algorithm in dda.c | Ilaria | ⏳ |
+| S7.7 | Implementare raycast() in raycaster.c | Ilaria | ⏳ |
+| S7.8 | Implementare draw_wall() in draw_walls.c | Ilaria | ⏳ |
+| S7.9 | Implementare draw_floor_ceiling() in draw_floor_ceiling.c | Ilaria | ⏳ |
+
+---
+
+## Sprint 6: Parser (.cub file) ⏳
+
+### Obiettivi
 - [ ] Implementare parser per textures (NO, SO, WE, EA)
 - [ ] Implementare parser per colori (F, C)
 - [ ] Implementare parser per mappa
 - [ ] Gestione errori
 - [ ] Free memory
 
-### Sprint 7: Raycasting Engine
-**Assegnato a:** Ilaria
+### Task Assegnati
 
-- [ ] Implementare DDA algorithm
-- [ ] Calcolo distanza muri
-- [ ] Textures sui muri
-- [ ] Floor/Ceiling colors
+| ID | Task | Assegnato a | Status |
+|----|------|-------------|--------|
+| S6.1 | Implementare parse_file() in parse_file.c | Gabriela | ⏳ |
+| S6.2 | Implementare parse_texture() in parse_textures.c | Gabriela | ⏳ |
+| S6.3 | Implementare parse_color() in parse_colors.c | Gabriela | ⏳ |
+| S6.4 | Implementare parse_map() in parse_map.c | Gabriela | ⏳ |
+| S6.5 | Implementare validate_map() in validate_map.c | Gabriela | ⏳ |
 
-### Sprint 8: Rendering
-**Assegnato a:** Ilaria
+---
 
-- [ ] MiniLibX init
-- [ ] Game loop
-- [ ] Image rendering
-- [ ] Double buffering
+## Sprint 10: Bonus ⏳
 
-### Sprint 9: Eventi
-**Assegnato a:** Ilaria
-
-- [ ] Keyboard input (WASD, frecce)
-- [ ] Window close (ESC, X rosso)
-- [ ] Mouse events (optional)
-
-### Sprint 10: Bonus
-**Assegnato a:** Team
-
+### Obiettivi
 - [ ] Wall collisions
 - [ ] Minimap
 - [ ] Doors
@@ -145,7 +225,7 @@
 
 ---
 
-## File Creati
+## File Creati/Modificati
 
 ### Documentazione
 ```
@@ -156,7 +236,8 @@ docs/
 │   ├── scaletta_ilaria.txt
 │   ├── cyber_escape_storia.txt
 │   ├── restrizioni_progetto.md
-│   └── regole_repo_42.md
+│   ├── regole_repo_42.md
+│   └── sprint_backlog.md
 ├── studio/
 │   ├── teoria_cub3D.txt
 │   ├── guida_studio_cub3D.txt
@@ -175,14 +256,26 @@ include/
 
 src/
 ├── events/
-│   ├── events.c
-│   └── keys.c
+│   ├── events.c        (init_mlx, create_window, setup_hooks, start_loop, close_window)
+│   └── keys.c          (init_keys, key_press, key_release)
 ├── render/
-│   └── render.c
+│   ├── render.c        (init_image, my_mlx_pixel_put, clear_image, render)
+│   ├── draw_walls.c    (TODO)
+│   └── draw_floor_ceiling.c (TODO)
+├── raycaster/
+│   ├── raycaster.c     (TODO)
+│   ├── dda.c           (TODO)
+│   └── player_move.c   (is_walkable, rotate_player, move_forward_back, move_strafe, move_player)
+├── parser/
+│   ├── parse_file.c    (TODO)
+│   ├── parse_textures.c (TODO)
+│   ├── parse_colors.c  (TODO)
+│   ├── parse_map.c     (TODO)
+│   └── validate_map.c  (TODO)
 └── utils/
-    ├── error.c
-    ├── free.c
-    └── utils.c
+    ├── error.c         (error_exit)
+    ├── free.c          (free_map, free_textures, free_main_image, free_game)
+    └── utils.c        (free_str_array, safe_free, create_color)
 ```
 
 ### Mappe
@@ -194,12 +287,23 @@ maps/
 
 ---
 
-## Note
+## Prossimi Passi
 
-- Todo i file sorgente hanno solo commenti TODO - nessuna implementazione
-- Ogni funzione ha un commento che spiega cosa deve fare
-- I TODO sono divisi tra Gabriela e Ilaria secondo divisione_lavoro_cub3D.txt
+1. **Implementsare DDA algorithm** (S7.6) - Ilaria
+2. **Implementare raycast()** (S7.7) - Ilaria
+3. **Implementare draw_wall()** (S7.8) - Ilaria
+4. **Implementare draw_floor_ceiling()** (S7.9) - Ilaria
+5. **Implementare Parser** (S6) - Gabriela
 
 ---
 
-*Ultimo aggiornamento: 5 Marzo 2026*
+## Note
+
+- Il rendering e gli eventi sono funzionanti
+- Mancano: DDA, raycasting, disegno muri
+- Le funzioni di utilità (free_str_array, safe_free) sono generiche e riutilizzabili
+- Tutto il codice e commentato per chiarezza
+
+---
+
+*Ultimo aggiornamento: 10 Marzo 2026*
