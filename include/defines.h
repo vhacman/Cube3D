@@ -1,158 +1,121 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   defines.h                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/03/05 22:27:31 by marvin            #+#    #+#             */
-/*   Updated: 2026/03/05 22:27:31 by marvin           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #ifndef DEFINES_H
 # define DEFINES_H
 
-/* ============================================================================ */
-/* COSTANTI E CONFIGURAZIONE DEL GIOCO */
-/* ============================================================================ */
+/* RISOLUZIONE SCHERMO */
 
-/* TODO: Risoluzione dello schermo */
-/* 
- * Valori suggeriti:
- * - 1920x1080 (full HD)
- * - 1280x720 (HD)
- * - 800x600 (classico, piu veloce)
- * - 640x480 (minimo, molto veloce)
+/*
+ * Risoluzione della finestra di gioco.
+ * Valore predefinito: 1280x720 (HD)
+ * Nota: la risoluzione non è più richiesta nel file .cub (2026)
  */
+# define SCREEN_WIDTH		1280
+# define SCREEN_HEIGHT		720
 
-/* TODO: Definire la risoluzione orizzontale */
+/* DIMENSIONI TEXTURE */
 
-/* TODO: Definire la risoluzione verticale */
-
-
-/* TODO: Dimensioni delle texture */
-/* 
- * Le texture devono essere quadrate. Valori comuni:
- * - 64x64 (standard, veloce)
- * - 128x128 (dettaglio maggiore)
- * - 512x512 (massimo dettaglio, piu lento)
- * 
- * NOTA: devono essere potenze di 2 per alcune operazioni bitwise
+/*
+ * Dimensioni delle texture dei muri.
+ * Devono essere quadrate e preferibilmente potenze di 2.
+ * Standard: 64x64
  */
+# define TEXTURE_WIDTH		64
+# define TEXTURE_HEIGHT		64
 
-/* TODO: Definire la larghezza texture */
+/* VELOCITA DI MOVIMENTO E ROTAZIONE */
 
-/* TODO: Definire l'altezza texture */
-
-
-/* TODO: Velocita di movimento e rotazione */
-/* 
- * Valori tipici:
- * - move_speed: 0.03 - 0.1 (0.05 e un buon punto di partenza)
- * - rot_speed: 0.02 - 0.08 (0.03 e un buon punto di partenza)
- * 
- * Valori piu alti = movimento piu veloce
+/*
+ * Velocità di movimento (avanti/indietro/spostamento laterale).
+ * Valori tipici: 0.03 - 0.1
  */
+# define MOVE_SPEED		0.05
 
-/* TODO: Definire la velocita di movimento (avanti/indietro/strafe) */
-
-/* TODO: Definire la velocita di rotazione (frecce sinistra/destra) */
-
-
-/* TODO: Codici dei tasti (Linux) */
-/* 
- * Questi sono i keycode per Linux. Per macOS sono diversi.
- * Se il gioco non risponde ai tasti, verificare che i codici siano corretti.
- * 
- * Valori standard Linux:
- * - ESC: 65307
- * - W: 119, A: 97, S: 115, D: 100
- * - Z: 122, Q: 113 (versione francese ZQSD)
- * - Freccia SU: 65362, GIU: 65364, SX: 65361, DX: 65363
+/*
+ * Velocità di rotazione (frecce sinistra/destra).
+ * Valori tipici: 0.02 - 0.08
  */
+# define ROT_SPEED		0.03
 
-/* TODO: Definire il codice del tasto ESC (uscita) */
+/* CODICI DEI TASTI (LINUX) */
 
-/* TODO: Definire il codice del tasto W (avanti) */
+/*
+ * Keycode per Linux.
+ * Nota: per macOS i valori sono diversi.
+ */
+# define KEY_ESC			65307
+# define KEY_W				119
+# define KEY_A				97
+# define KEY_S				115
+# define KEY_D				100
+# define KEY_Z				122		// avanti (versione ZQSD)
+# define KEY_Q				113		// spostamento laterale (versione ZQSD)
+# define KEY_UP				65362	// freccia SU
+# define KEY_DOWN			65364	// freccia GIU
+# define KEY_LEFT			65361	// freccia SX (rotazione)
+# define KEY_RIGHT			65363	// freccia DX (rotazione)
 
-/* TODO: Definire il codice del tasto A (strafe sinistra) */
+/* EVENTI MINILIBX */
 
-/* TODO: Definire il codice del tasto S (indietro) */
-
-/* TODO: Definire il codice del tasto D (strafe destra) */
-
-/* TODO: Definire il codice del tasto Z (avanti, versione ZQSD) */
-
-/* TODO: Definire il codice del tasto Q (strafe sinistra, versione ZQSD) */
-
-/* TODO: Definire il codice della freccia SU (avanti) */
-
-/* TODO: Definire il codice della freccia GIU (indietro) */
-
-/* TODO: Definire il codice della freccia SX (rotazione sinistra) */
-
-/* TODO: Definire il codice della freccia DX (rotazione destra) */
-
-
-/* TODO: Eventi miniLibX */
-/* 
- * Codici degli eventi per mlx_hook:
- * - KeyPress: 2
- * - KeyRelease: 3
+/*
+ * Codici eventi per mlx_hook:
+ * - KeyPress: 2 (tasto premuto)
+ * - KeyRelease: 3 (tasto rilasciato)
  * - DestroyNotify: 17 (click sulla X della finestra)
- * 
- * Maschere (usate nel secondo parametro di mlx_hook):
+ */
+# define EVENT_KEY_PRESS		2
+# define EVENT_KEY_RELEASE	3
+# define EVENT_DESTROY_NOTIFY	17
+
+/*
+ * Maschere eventi:
  * - KeyPressMask: 1L<<0
  * - KeyReleaseMask: 1L<<1
  */
+# define MASK_KEY_PRESS		(1L << 0)
+# define MASK_KEY_RELEASE	(1L << 1)
 
-/* TODO: Definire l'evento tasto premuto */
+/* COLORI */
 
-/* TODO: Definire l'evento tasto rilasciato */
-
-/* TODO: Definire l'evento chiusura finestra (click X) */
-
-/* TODO: Definire la maschera per KeyPress */
-
-/* TODO: Definire la maschera per KeyRelease */
-
-
-/* TODO: Colori */
-/* 
- * I colori sono nel formato 0x00RRGGBB (32 bit)
- * - Rosso: (255 << 16)
- * - Verde: (255 << 8)
- * - Blu: 255
- * 
- * Creazione colore: (r << 16 | g << 8 | b)
+/*
+ * Colori nel formato 0x00RRGGBB (32 bit)
+ * Creazione: (r << 16 | g << 8 | b)
  */
+# define COLOR_BLACK		0x00000000
+# define COLOR_WHITE		0x00FFFFFF
+# define COLOR_RED			0x00FF0000
+# define COLOR_GREEN		0x0000FF00
+# define COLOR_BLUE			0x000000FF
 
-/* TODO: Definire il colore nero (muro base se nessuna texture) */
+/* Colori default per floor e ceiling (valori RGB) */
+# define DEFAULT_FLOOR_COLOR		0x00555555	// grigio scuro
+# define DEFAULT_CEILING_COLOR	0x00333333	// grigio molto scuro
 
-/* TODO: Definire il colore bianco */
+/* VALORI SPECIALI */
 
-/* TODO: Definire il colore rosso */
-
-/* TODO: Definire il colore verde */
-
-/* TODO: Definire il colore blu */
-
-
-/* TODO: Valori speciali */
-/* 
- * Usati per indicare errori o stati speciali
+/*
+ * Valore "infinito" per deltaDist quando rayDir è 0.
+ * Usato nell'algoritmo DDA per evitare divisione per zero.
  */
+# define INF				1e30
 
-/* TODO: Definire un valore infinito (per deltaDist quando rayDir e 0) */
+/*
+ * Valori booleani.
+ * Se libft è disponibile, usare t_bool TRUE/FALSE
+ */
+# define FALSE				0
+# define TRUE				1
 
-/* TODO: Definire il valore booleano falso */
+/* INDICI TEXTURE MURI */
 
-/* TODO: Definire il valore booleano vero */
+/*
+ * Indici dell'array textures[4] in t_game.
+ * Corrispondono alle direzioni: Nord, Sud, Ovest, Est
+ */
+# define TEX_NO				0	// Nord
+# define TEX_SO				1	// Sud
+# define TEX_WE				2	// Ovest
+# define TEX_EA				3	// Est
 
-
-/* ============================================================================ */
 /* AGGIUNGERE ALTRE COSTANTI QUI SE NECESSARIO */
-/* ============================================================================ */
 
 #endif
