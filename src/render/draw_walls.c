@@ -9,6 +9,7 @@
 /*   Updated: 2026/03/16 03:22:55 by ilnassi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "cub3d.h"
 
 /* Restituisce il colore del muro in base al lato colpito.
