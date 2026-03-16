@@ -71,6 +71,12 @@ typedef struct s_player
 	double	dir_y;
 	double	room_plane_x;	// piano della camera (determina il FOV)
 	double	room_plane_y;
+	/* --- campi aggiunti per DDA --- */
+	double	ray_dir_x;
+	double	ray_dir_y;
+	int		hit_side;
+	int		wall_map_x;
+	int		wall_map_y;
 }	t_player;
 
 /*
@@ -91,6 +97,21 @@ typedef struct s_map
 	int		player_y;
 	char	player_dir;		// carattere che indica l'orientamento iniziale
 }	t_map;
+
+/* ============================================================================ */
+/* STRUCT PER DDA */
+/* ============================================================================ */
+typedef struct s_dda
+{
+	int		map_x;
+	int		map_y;
+	int		step_x;
+	int		step_y;
+	double	side_dist_x;
+	double	side_dist_y;
+	double	delta_dist_x;
+	double	delta_dist_y;
+}	t_dda;
 
 /*
  * t_game - Gioco principale
