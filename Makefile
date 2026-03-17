@@ -32,7 +32,7 @@ LIBFT       = $(LIBFT_DIR)/libft.a
 # MiniLibX (Linux)
 MLX_DIR     = minilibx-linux
 MLX         = $(MLX_DIR)/libmlx.a
-MLX_FLAGS   = -L$(MLX_DIR) -lmlx -lXext -lX11 -lm
+MLX_FLAGS = -L$(MLX_DIR) -lmlx_Linux -lXext -lX11 -lm //aggiunto -lmlx_Linux, solo -lmlx non compilava
 
 # Sources
 SRCS        = $(SRC_DIR)/main.c \
@@ -79,7 +79,7 @@ $(NAME): $(OBJS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR)/includes -c $< -o $@
+	@$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR)/includes -I$(MLX_DIR) -c $< -o $@ //aggiunto ultima parte per far funzionare minilibx
 
 $(LIBFT):
 	@$(MAKE) -C $(LIBFT_DIR)
