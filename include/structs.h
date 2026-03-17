@@ -113,6 +113,13 @@ typedef struct s_dda
 	double	delta_dist_y;
 }	t_dda;
 
+typedef struct s_weapon
+{
+	t_img	img;
+	int		width;
+	int		height;
+}	t_weapon;
+
 /*
  * t_game - Gioco principale
  * Struct che contiene tutto il gioco. In questo modo e facile
@@ -129,6 +136,7 @@ typedef struct s_game
 	t_keys		keys;			// stato dei tasti
 	int			floor_color;	// colore del pavimento (formato 0x00RRGGBB)
 	int			ceiling_color;	// colore del soffitto
+	t_weapon	weapon;
 
 	/* TODO: Bonus (da aggiungere quando implementati):
 	 * - z_buffer: array delle distanze dei muri per ogni colonna (per sprite)
