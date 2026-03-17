@@ -78,6 +78,13 @@ int		validate_map(t_game *game);
  * FUNZIONI DI RAY-CASTING
  */
 
+int	is_walkable(t_game *game, double x, double y);
+void	rotate_player(t_game *game, double rot_speed);
+void	move_forward_back(t_game *game, int direction);
+void	move_strafe(t_game *game, int direction);
+void	move_player(t_game *game);
+double	perform_dda(t_game *game, int x);
+
 /*
  * Esegue il ray-casting per un frame
  * Parametri: puntatore a t_game
@@ -106,6 +113,11 @@ void	move_player(t_game *game);
 /* 
  * FUNZIONI DI RENDERING
  */
+
+int	load_all_textures(t_game *game);
+t_texture	*get_texture(t_game *game, int side);
+int	get_tex_pixel(t_texture *tex, int tex_x, int tex_y);
+int	get_tex_x(t_game *game, t_texture *tex, int side, double perp_dist);
 
 /*
  * Rendering principale
@@ -138,7 +150,7 @@ void	draw_floor_ceiling(t_game *game);
  * Restituisce: puntatore a t_img, NULL se errore
  * File: src/render/textures.c
  */
-t_img	*load_texture(void *mlx, char *path, int *width, int *height);
+int	load_texture(t_game *game, t_texture *tex, char *path);
 
 /*
  * Rendering degli sprite
@@ -204,6 +216,7 @@ void	safe_free(void **ptr);
  * File: src/utils/color_utils.c
  */
 int		create_color(int r, int g, int b);
+void	free_game(t_game *game);
 
 /* 
  * FUNZIONI BONUS
@@ -232,5 +245,8 @@ int		mouse_move(int x, int y, t_game *game);
  * File: src/bonus/sprites_anim_bonus.c
  */
 void	render_animated_sprites(t_game *game);
+
+void	error_exit(t_game *game, char *message);
+void	my_mlx_pixel_put(t_img *img, int x, int y, int color);
 
 #endif
