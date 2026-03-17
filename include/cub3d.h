@@ -118,6 +118,9 @@ int	load_all_textures(t_game *game);
 t_texture	*get_texture(t_game *game, int side);
 int	get_tex_pixel(t_texture *tex, int tex_x, int tex_y);
 int	get_tex_x(t_game *game, t_texture *tex, int side, double perp_dist);
+int	load_weapon(t_game *game); //weapon.c
+void	draw_weapon(t_game *game); //weapon.c
+void	free_weapon(t_game *game); //weapon.c
 
 /*
  * Rendering principale
