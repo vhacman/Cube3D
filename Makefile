@@ -32,7 +32,7 @@ LIBFT       = $(LIBFT_DIR)/libft.a
 # MiniLibX (Linux)
 MLX_DIR     = minilibx-linux
 MLX         = $(MLX_DIR)/libmlx.a
-MLX_FLAGS = -L$(MLX_DIR) -lmlx_Linux -lXext -lX11 -lm //aggiunto -lmlx_Linux, solo -lmlx non compilava
+MLX_FLAGS = -L$(MLX_DIR) -lmlx_Linux -lXext -lX11 -lm
 
 # Sources
 SRCS        = $(SRC_DIR)/main.c \
@@ -41,6 +41,7 @@ SRCS        = $(SRC_DIR)/main.c \
               $(SRC_DIR)/parser/parse_textures.c \
               $(SRC_DIR)/parser/parse_colors.c \
               $(SRC_DIR)/parser/validate_map.c \
+              $(SRC_DIR)/parser/parser_utils.c \
               $(SRC_DIR)/raycaster/raycaster.c \
               $(SRC_DIR)/raycaster/dda.c \
               $(SRC_DIR)/raycaster/player_move.c \
@@ -49,11 +50,13 @@ SRCS        = $(SRC_DIR)/main.c \
               $(SRC_DIR)/render/draw_floor_ceiling.c \
               $(SRC_DIR)/render/textures.c \
               $(SRC_DIR)/render/sprites.c \
+              $(SRC_DIR)/render/weapon.c \
               $(SRC_DIR)/events/events.c \
               $(SRC_DIR)/events/keys.c \
               $(SRC_DIR)/utils/utils.c \
               $(SRC_DIR)/utils/error.c \
-              $(SRC_DIR)/utils/free.c
+              $(SRC_DIR)/utils/free.c \
+              $(SRC_DIR)/parser/parser_utils/parser_utils.c
 
 OBJS        = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 
@@ -79,7 +82,7 @@ $(NAME): $(OBJS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR)/includes -I$(MLX_DIR) -c $< -o $@ //aggiunto ultima parte per far funzionare minilibx
+	@$(CC) $(CFLAGS) -I$(INC_DIR) -I$(LIBFT_DIR)/includes -I$(MLX_DIR) -c $< -o $@
 
 $(LIBFT):
 	@$(MAKE) -C $(LIBFT_DIR)

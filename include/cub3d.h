@@ -5,7 +5,9 @@
 /* INCLUDES */
 
 # include <mlx.h>
+# include <fcntl.h>
 # include "../libft/includes/libft.h"
+# include "../libft/includes/get_next_line.h"
 # include "structs.h"
 # include "defines.h"
 
@@ -163,9 +165,45 @@ int	load_texture(t_game *game, t_texture *tex, char *path);
  */
 void	render_sprites(t_game *game);
 
-/* 
+/*
  * FUNZIONI DI EVENTI
  */
+
+/*
+ * Inizializza miniLibX
+ * File: src/events/events.c
+ */
+void	*init_mlx(void);
+
+/*
+ * Crea la finestra di gioco
+ * File: src/events/events.c
+ */
+void	*create_window(void *mlx);
+
+/*
+ * Registra tutti gli hook (tasti, finestra, game loop)
+ * File: src/events/events.c
+ */
+void	setup_hooks(t_game *game);
+
+/*
+ * Avvia il loop principale degli eventi
+ * File: src/events/events.c
+ */
+void	start_loop(t_game *game);
+
+/*
+ * Inizializza lo stato dei tasti a 0
+ * File: src/events/keys.c
+ */
+void	init_keys(t_game *game);
+
+/*
+ * Crea l'immagine di rendering (buffer)
+ * File: src/render/render.c
+ */
+void	init_image(t_game *game);
 
 /*
  * Gestore del click sulla X
@@ -211,6 +249,28 @@ void	free_str_array(char **arr);
  * File: src/utils/utils.c
  */
 void	safe_free(void **ptr);
+
+/* UTILITY PER IL PARSER
+ * File: src/utils/parser_utils.c
+ */
+
+/* Legge tutte le righe di fd in un array terminato da NULL */
+char	**read_all_lines(int fd);
+
+/* Controlla se una riga e di tipo header (NO/SO/WE/EA/F/C) */
+int		is_header_line(char *line);
+
+/* Salta spazi e tab iniziali, restituisce puntatore al primo char non-ws */
+char	*skip_whitespace(char *line);
+
+/* Rimuove '\n' finale dalla stringa (in-place) */
+void	trim_newline(char *line);
+
+/* Controlla che la stringa contenga solo cifre decimali (no segno) */
+int		is_valid_uint_str(char *s);
+
+/* Conta gli elementi non-NULL in un array NULL-terminato */
+int		count_str_array(char **arr);
 
 /*
  * Crea un colore

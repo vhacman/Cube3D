@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "cub3d.h"
-#include <math.h>
 
 /* Calcola delta_dist_x e delta_dist_y: la distanza che il raggio
 percorre tra due bordi di cella consecutivi sullo stesso asse.

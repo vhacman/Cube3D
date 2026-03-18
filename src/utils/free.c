@@ -80,6 +80,7 @@ void	free_game(t_game *game)
 	free_map(&game->map);
 	free_textures(game);
 	free_main_image(game);
+	free_weapon(game);
 	if (game->win)
 		mlx_destroy_window(game->mlx, game->win);
 	if (game->mlx)
@@ -88,4 +89,44 @@ void	free_game(t_game *game)
 		free(game->mlx);
 	}
 	free(game);
+}
+
+/* FUNZIONI DI UTILITA */
+
+/* Libera un array di stringhe (terminato da NULL)
+ * Parametri: puntatore a array di stringhe
+ * Cosa fa: libera ogni stringa e poi l'array stesso
+ * Uso: libera la mappa (grid), texture paths, ecc.
+ * Esempio:
+ *   char **arr = {"ciao", "mondo", NULL};
+ *   free_str_array(arr); */
+void	free_str_array(char **arr)
+{
+	int	i;
+
+	if (!arr)
+		return ;
+	i = 0;
+	while (arr[i])
+	{
+		free(arr[i]);
+		arr[i] = NULL;
+		i++;
+	}
+	free(arr);
+}
+
+/* Libera un puntatore e lo imposta a NULL
+ * Parametri: puntatore a puntatore (void**)
+ * Cosa fa: libera la memoria e imposta il puntatore a NULL
+ * Uso: previene use-after-free
+ * Esempio:
+ *   void *ptr = malloc(100);
+ *   safe_free(&ptr); // ptr ora e NULL */
+void	safe_free(void **ptr)
+{
+	if (!ptr || !*ptr)
+		return ;
+	free(*ptr);
+	*ptr = NULL;
 }

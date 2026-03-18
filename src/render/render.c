@@ -73,5 +73,7 @@ int	render(t_game *game)
 	raycast(game);
 	/* Mette l'immagine nella finestra */
 	mlx_put_image_to_window(game->mlx, game->win, game->img.img, 0, 0);
+	/* Disegna l'arma sopra la scena */
+	draw_weapon(game);
 	return (0);
 }
