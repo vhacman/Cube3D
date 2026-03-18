@@ -1,32 +1,22 @@
 #include "cub3d.h"
 
-/* ============================================================================ */
-/* LIBERAZIONE MEMORIA */
-/* ============================================================================ */
-
-/* Libera la mappa
- * Parametri: puntatore a t_map
- * Cosa fa:
- *   - Libera ogni riga della mappa (free(grid[i]) per ogni i)
- *   - Libera l'array delle righe (free(grid))
- *   - Azzera width e height */
+/* Libera la griglia 2D e azzera tutti i campi di t_map. */
 void	free_map(t_map *map)
 {
 	if (!map)
 		return ;
-	free_str_array(map->grid); /* Libera tutte le righe e l'array */
+	free_str_array(map->grid);
 	map->grid = NULL;
 	map->width = 0;
 	map->height = 0;
+	map->player_x = 0;
+	map->player_y = 0;
+	map->player_dir = 0;
 }
 
-/* Libera le texture
- * Parametri: puntatore a t_game
- * Cosa fa:
- *   - Per ogni texture in game->textures:
- *     - Se l'immagine esiste: mlx_destroy_image(mlx, texture.img)
- *     - Se il path esiste: free(path)
- *   - Azzera width e height a 0 */
+/* Distrugge le immagini MLX e libera i path delle 4 texture.
+ * Azzeriamo img.img dopo mlx_destroy_image per evitare doppio-free
+ * se free_textures venisse chiamata due volte. */
 void	free_textures(t_game *game)
 {
 	int	i;
@@ -37,12 +27,10 @@ void	free_textures(t_game *game)
 	while (i < 4)
 	{
 		if (game->textures[i].img.img)
+		{
 			mlx_destroy_image(game->mlx, game->textures[i].img.img);
-		/*
-			- game->textures[i].path è char * (puntatore semplice)
-			- &game->textures[i].path è char ** (puntatore a puntatore)
-			- (void **)&game->textures[i].path cast a void ** per passarlo a safe_free
- 		*/
+			game->textures[i].img.img = NULL;
+		}
 		safe_free((void **)&game->textures[i].path);
 		game->textures[i].width = 0;
 		game->textures[i].height = 0;
@@ -50,29 +38,19 @@ void	free_textures(t_game *game)
 	}
 }
 
-/* Libera l'immagine principale
- * Parametri: puntatore a t_game
- * Cosa fa:
- *   - Se game->img.img esiste: mlx_destroy_image(game->mlx, game->img.img) */
+/* Distrugge il buffer di rendering principale. */
 void	free_main_image(t_game *game)
 {
 	if (!game || !game->mlx || !game->img.img)
 		return ;
 	mlx_destroy_image(game->mlx, game->img.img);
+	game->img.img = NULL;
 }
 
-/* Libera tutto e chiudi
- * Parametri: puntatore a t_game
- * Cosa fa (in ordine):
- *   - Libera la mappa (libera grid)
- *   - Libera le texture
- *   - Libera l'immagine principale
- *   - Se la finestra esiste: mlx_destroy_window(game->mlx, game->win)
- *   - Se mlx esiste: mlx_destroy_display(game->mlx) (solo Linux)
- *   - Libera la struttura game stessa (free(game))
- * 
- * Note: l'ordine e importante! Bisogna distruggere gli oggetti MLX
- * prima di distruggere il contesto MLX. */
+/* Libera tutto il gioco nell'ordine corretto:
+ * oggetti MLX prima del contesto MLX, contesto prima di free(game).
+ * Qualsiasi chiamata successiva a free_game con lo stesso puntatore
+ * e' neutralizzata dal check iniziale !game. */
 void	free_game(t_game *game)
 {
 	if (!game)
@@ -91,15 +69,7 @@ void	free_game(t_game *game)
 	free(game);
 }
 
-/* FUNZIONI DI UTILITA */
-
-/* Libera un array di stringhe (terminato da NULL)
- * Parametri: puntatore a array di stringhe
- * Cosa fa: libera ogni stringa e poi l'array stesso
- * Uso: libera la mappa (grid), texture paths, ecc.
- * Esempio:
- *   char **arr = {"ciao", "mondo", NULL};
- *   free_str_array(arr); */
+/* Libera un array di stringhe NULL-terminato. */
 void	free_str_array(char **arr)
 {
 	int	i;
@@ -116,13 +86,7 @@ void	free_str_array(char **arr)
 	free(arr);
 }
 
-/* Libera un puntatore e lo imposta a NULL
- * Parametri: puntatore a puntatore (void**)
- * Cosa fa: libera la memoria e imposta il puntatore a NULL
- * Uso: previene use-after-free
- * Esempio:
- *   void *ptr = malloc(100);
- *   safe_free(&ptr); // ptr ora e NULL */
+/* Libera un puntatore generico e lo azzera per prevenire use-after-free. */
 void	safe_free(void **ptr)
 {
 	if (!ptr || !*ptr)
