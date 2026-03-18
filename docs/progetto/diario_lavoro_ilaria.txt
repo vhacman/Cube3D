@@ -43,7 +43,7 @@ Ho sistemato un po' di cose che non andavano:
 - dopo `mlx_destroy_image` il puntatore non veniva azzerato → rischio doppio-free
 - `free_map` non azzerava `player_x`, `player_y`, `player_dir`
 - `free_main_image` non azzerava `game->img.img` dopo la destroy
-- rimossi commenti multi-riga dentro i corpi di funzione (norminette li boccia)
+- rimossi commenti multi-riga dentro i corpi di funzione 
 
 ---
 
