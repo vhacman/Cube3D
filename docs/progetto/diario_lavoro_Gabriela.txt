@@ -29,6 +29,10 @@ textures/weapon/weapon_idle.xpm — 256x256, bordi puliti
 
 Aggiunto altri file .cub in maps per test
 
+7. Norminette 
+Iniziato a sistemare con norminette le cartelle cub3d/raycaster e cub3d/render. 
+Bisogna modificare il main, norminette non vuole operatore ternario.
+
 ================================================================
 **VALGRIND**
 ================================================================
@@ -44,125 +48,9 @@ valgrind --leak-check=full ./cub3D maps/valid_map.cub
 CHECK MAPPA
 ================================================================
 
-Crea una cartella maps/error_tests/ e metti questi file dentro:
-1. no_player.cub — mappa senza giocatore:
-NO ./textures/wall_floor/no.xpm
-SO ./textures/wall_floor/so.xpm
-WE ./textures/wall_floor/we.xpm
-EA ./textures/wall_floor/ea.xpm
-F 1,16,26
-C 40,45,50
+Creato una cartella maps/error_tests/ e ho messo dentro 9 file .cub:
 
-11111
-10001
-10001
-11111
-
-2. open_map.cub — mappa non chiusa:
-NO ./textures/wall_floor/no.xpm
-SO ./textures/wall_floor/so.xpm
-WE ./textures/wall_floor/we.xpm
-EA ./textures/wall_floor/ea.xpm
-F 1,16,26
-C 40,45,50
-
-11111
-10N01
-10001
-11011
-
-3. invalid_char.cub — carattere non valido nella mappa:
-NO ./textures/wall_floor/no.xpm
-SO ./textures/wall_floor/so.xpm
-WE ./textures/wall_floor/we.xpm
-EA ./textures/wall_floor/ea.xpm
-F 1,16,26
-C 40,45,50
-
-11111
-10N01
-102 1
-11111
-
-4. bad_color_floor.cub — floor con solo 2 valori:
-NO ./textures/wall_floor/no.xpm
-SO ./textures/wall_floor/so.xpm
-WE ./textures/wall_floor/we.xpm
-EA ./textures/wall_floor/ea.xpm
-F 1,16
-C 40,45,50
-
-11111
-10N01
-10001
-11111
-
-5. bad_color_range.cub — valore RGB fuori range:
-NO ./textures/wall_floor/no.xpm
-SO ./textures/wall_floor/so.xpm
-WE ./textures/wall_floor/we.xpm
-EA ./textures/wall_floor/ea.xpm
-F 1,16,300
-C 40,45,50
-
-11111
-10N01
-10001
-11111
-
-6. missing_texture.cub — texture inesistente:
-NO ./textures/wall_floor/no.xpm
-SO ./textures/wall_floor/so.xpm
-WE ./textures/wall_floor/we.xpm
-EA ./textures/wall_floor/NONEXISTENT.xpm
-F 1,16,26
-C 40,45,50
-
-11111
-10N01
-10001
-11111
-
-7. duplicate_texture.cub — texture duplicata:
-NO ./textures/wall_floor/no.xpm
-NO ./textures/wall_floor/no.xpm
-SO ./textures/wall_floor/so.xpm
-WE ./textures/wall_floor/we.xpm
-EA ./textures/wall_floor/ea.xpm
-F 1,16,26
-C 40,45,50
-
-11111
-10N01
-10001
-11111
-
-8. missing_ceiling.cub — manca il ceiling:
-NO ./textures/wall_floor/no.xpm
-SO ./textures/wall_floor/so.xpm
-WE ./textures/wall_floor/we.xpm
-EA ./textures/wall_floor/ea.xpm
-F 1,16,26
-
-11111
-10N01
-10001
-11111
-
-9. wrong_extension.cub — estensione sbagliata, salvala come wrong_extension.map:
-NO ./textures/wall_floor/no.xpm
-SO ./textures/wall_floor/so.xpm
-WE ./textures/wall_floor/we.xpm
-EA ./textures/wall_floor/ea.xpm
-F 1,16,26
-C 40,45,50
-
-11111
-10N01
-10001
-11111
-
-Poi lancia tutti con questo script bash:
+Ho lanciato tutti con questo script bash:
 bashecho "=== ERROR TESTS ===" && \
 ./cub3D maps/error_tests/no_player.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
 ./cub3D maps/error_tests/open_map.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
@@ -230,3 +118,19 @@ A parte questo dettaglio, il progetto è in ottima forma:
 ✅ 9/9 error tests passati
 ✅ Zero memory leak
 ✅ Gioco funzionante
+
+
+================================================================
+MODIFICARE MAIN
+================================================================
+
+➜  src norminette main.c 
+Setting locale to en_US
+main.c: Error!
+Error: INVALID_HEADER       (line:   1, col:   1):	Missing or invalid 42 header
+Error: TERNARY_FBIDDEN      (line:  17, col:  43):	Ternaries are forbidden
+Error: TERNARY_FBIDDEN      (line:  18, col:  50):	Ternaries are forbidden
+Error: TERNARY_FBIDDEN      (line:  23, col:  43):	Ternaries are forbidden
+Error: TERNARY_FBIDDEN      (line:  26, col:  50):	Ternaries are forbidden
+
+la norminette non vuole l'operatore ternario :(
