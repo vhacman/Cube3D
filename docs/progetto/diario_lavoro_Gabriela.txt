@@ -38,3 +38,195 @@ valgrind ./cub3D maps/valid_map.cub
 # Per un report più dettagliato sui leak:
 
 valgrind --leak-check=full ./cub3D maps/valid_map.cub
+
+
+================================================================
+CHECK MAPPA
+================================================================
+
+Crea una cartella maps/error_tests/ e metti questi file dentro:
+1. no_player.cub — mappa senza giocatore:
+NO ./textures/wall_floor/no.xpm
+SO ./textures/wall_floor/so.xpm
+WE ./textures/wall_floor/we.xpm
+EA ./textures/wall_floor/ea.xpm
+F 1,16,26
+C 40,45,50
+
+11111
+10001
+10001
+11111
+
+2. open_map.cub — mappa non chiusa:
+NO ./textures/wall_floor/no.xpm
+SO ./textures/wall_floor/so.xpm
+WE ./textures/wall_floor/we.xpm
+EA ./textures/wall_floor/ea.xpm
+F 1,16,26
+C 40,45,50
+
+11111
+10N01
+10001
+11011
+
+3. invalid_char.cub — carattere non valido nella mappa:
+NO ./textures/wall_floor/no.xpm
+SO ./textures/wall_floor/so.xpm
+WE ./textures/wall_floor/we.xpm
+EA ./textures/wall_floor/ea.xpm
+F 1,16,26
+C 40,45,50
+
+11111
+10N01
+102 1
+11111
+
+4. bad_color_floor.cub — floor con solo 2 valori:
+NO ./textures/wall_floor/no.xpm
+SO ./textures/wall_floor/so.xpm
+WE ./textures/wall_floor/we.xpm
+EA ./textures/wall_floor/ea.xpm
+F 1,16
+C 40,45,50
+
+11111
+10N01
+10001
+11111
+
+5. bad_color_range.cub — valore RGB fuori range:
+NO ./textures/wall_floor/no.xpm
+SO ./textures/wall_floor/so.xpm
+WE ./textures/wall_floor/we.xpm
+EA ./textures/wall_floor/ea.xpm
+F 1,16,300
+C 40,45,50
+
+11111
+10N01
+10001
+11111
+
+6. missing_texture.cub — texture inesistente:
+NO ./textures/wall_floor/no.xpm
+SO ./textures/wall_floor/so.xpm
+WE ./textures/wall_floor/we.xpm
+EA ./textures/wall_floor/NONEXISTENT.xpm
+F 1,16,26
+C 40,45,50
+
+11111
+10N01
+10001
+11111
+
+7. duplicate_texture.cub — texture duplicata:
+NO ./textures/wall_floor/no.xpm
+NO ./textures/wall_floor/no.xpm
+SO ./textures/wall_floor/so.xpm
+WE ./textures/wall_floor/we.xpm
+EA ./textures/wall_floor/ea.xpm
+F 1,16,26
+C 40,45,50
+
+11111
+10N01
+10001
+11111
+
+8. missing_ceiling.cub — manca il ceiling:
+NO ./textures/wall_floor/no.xpm
+SO ./textures/wall_floor/so.xpm
+WE ./textures/wall_floor/we.xpm
+EA ./textures/wall_floor/ea.xpm
+F 1,16,26
+
+11111
+10N01
+10001
+11111
+
+9. wrong_extension.cub — estensione sbagliata, salvala come wrong_extension.map:
+NO ./textures/wall_floor/no.xpm
+SO ./textures/wall_floor/so.xpm
+WE ./textures/wall_floor/we.xpm
+EA ./textures/wall_floor/ea.xpm
+F 1,16,26
+C 40,45,50
+
+11111
+10N01
+10001
+11111
+
+Poi lancia tutti con questo script bash:
+bashecho "=== ERROR TESTS ===" && \
+./cub3D maps/error_tests/no_player.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/open_map.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/invalid_char.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/bad_color_floor.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/bad_color_range.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/missing_texture.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/duplicate_texture.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/missing_ceiling.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/wrong_extension.map && echo "FAIL: doveva dare errore" || echo "OK"
+Tutti devono stampare Error\n + messaggio e poi OK. Se uno stampa FAIL c'è un bug da correggere!➜  Cube3D-ilaria make       
+
+
+📦 Building libft...
+✅ cub3D compiled successfully.
+➜  Cube3D-ilaria ./cub3D maps/valid_map.cub                           
+➜  Cube3D-ilaria echo "=== ERROR TESTS ===" && \
+./cub3D maps/error_tests/no_player.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/open_map.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/invalid_char.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/bad_color_floor.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/bad_color_range.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/missing_texture.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/duplicate_texture.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/missing_ceiling.cub && echo "FAIL: doveva dare errore" || echo "OK" && \
+./cub3D maps/error_tests/wrong_extension.map && echo "FAIL: doveva dare errore" || echo "OK"
+=== ERROR TESTS ===
+Error
+No player start position (N/S/E/W) in map
+OK
+Error
+Map is not closed/surrounded by walls
+OK
+Error
+Map is not closed/surrounded by walls
+OK
+Error
+Invalid color format (expected R,G,B with 0-255)
+OK
+Error
+Invalid color format (expected R,G,B with 0-255)
+OK
+Error
+Failed to load textures
+OK
+Error
+Duplicate texture definition
+OK
+Error
+Missing floor or ceiling color
+OK
+Error
+File must have .cub extension
+OK
+
+
+➜  Cube3D-ilariaMostra altro1:02 PMTutti e 9 OK! 🎉
+Però noto una cosa — invalid_char.cub dà "Map is not closed/surrounded by walls" invece di "Invalid character in map". 
+
+## ➜ Il carattere 2 nella mappa viene trattato come cella aperta invece che come carattere non valido.
+Questo perché validate_map di Gabriela controlla prima la chiusura e poi i caratteri — o il 2 viene trattato come spazio. Non è un bug critico per la correzione, ma è un messaggio di errore impreciso.
+Di' a Gabriela di verificare l'ordine dei check in validate_map — il controllo caratteri validi dovrebbe venire prima del controllo chiusura.
+A parte questo dettaglio, il progetto è in ottima forma:
+
+✅ 9/9 error tests passati
+✅ Zero memory leak
+✅ Gioco funzionante
