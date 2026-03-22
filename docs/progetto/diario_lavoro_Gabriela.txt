@@ -1,0 +1,26 @@
+Riepilogo dle 22/03/2026
+
+1. Errore di compilazione cc1plus
+Il compilatore cc sulla macchina puntava a una versione rotta. Risolto cambiando CC = gcc nel Makefile.
+2. Failed to load textures
+Il file test.cub cercava le texture in ./textures/no.xpm ma i file stavano in ./textures/wall&floor/no.xpm. Risolto aggiornando i path nel .cub.
+3. Muri con colore solido invece delle texture
+draw_walls.c usava ancora get_wall_color (la versione temporanea verde). Sostituito con la versione che usa get_texture + get_tex_pixel + calc_tex_y.
+4. Muri che si "liquefano" vicino alla parete
+Il calcolo di tex_y usava draw_start come riferimento, che cambia quando la colonna viene clampata ai bordi schermo. Risolto usando line_height completo come riferimento con clamp finale su tex->height.
+5. Arma troppo piccola + sfondo nero
+Tre problemi separati:
+
+Dimensione aumentata da 128x128 a 256x256
+mlx_put_image_to_window non gestisce la trasparenza — sostituito con rendering pixel per pixel nel buffer principale
+Il check color != 0 non bastava perché mlx rappresenta i pixel trasparenti sia come 0x00000000 che come 0xFF000000. Risolto con if (color != 0 && color != (int)0xFF000000)
+
+6. Contorno verde dell'arma
+Artefatti di compressione JPEG sui bordi. Riprocessata l'immagine originale con rimozione più aggressiva dei pixel di bordo.
+
+File modificati:
+
+maps/test.cub — path texture e colori
+src/render/draw_walls.c — texture mapping completo
+src/render/weapon.c — rendering pixel per pixel con trasparenza corretta
+textures/weapon/weapon_idle.xpm — 256x256, bordi puliti
