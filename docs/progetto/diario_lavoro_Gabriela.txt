@@ -33,6 +33,9 @@ Aggiunto altri file .cub in maps per test
 Iniziato a sistemare con norminette le cartelle cub3d/raycaster e cub3d/render. 
 Bisogna modificare il main, norminette non vuole operatore ternario.
 
+8. Aggiunto cartella textures con file .xpm
+Ho creato nel mio branch la cartella texture, con le texture dell'arma e delle pareti.
+
 ================================================================
 **VALGRIND**
 ================================================================
