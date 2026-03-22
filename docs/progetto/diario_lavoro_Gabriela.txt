@@ -1,4 +1,6 @@
-Riepilogo dle 22/03/2026
+================================================================
+RIEPILOGO DEL 22/03/2026
+================================================================
 
 1. Errore di compilazione cc1plus
 Il compilatore cc sulla macchina puntava a una versione rotta. Risolto cambiando CC = gcc nel Makefile.
@@ -24,3 +26,15 @@ maps/test.cub — path texture e colori
 src/render/draw_walls.c — texture mapping completo
 src/render/weapon.c — rendering pixel per pixel con trasparenza corretta
 textures/weapon/weapon_idle.xpm — 256x256, bordi puliti
+
+Aggiunto altri file .cub in maps per test
+
+================================================================
+**VALGRIND**
+================================================================
+
+valgrind ./cub3D maps/valid_map.cub
+
+# Per un report più dettagliato sui leak:
+
+valgrind --leak-check=full ./cub3D maps/valid_map.cub
