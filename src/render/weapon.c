@@ -26,7 +26,7 @@ static void     draw_weapon_pixels(t_game *game, int start_x, int start_y)
                 while (x < (SCREEN_WIDTH + game->weapon.width) / 2)
                 {
                         pixel = game->weapon.img.addr
-                                + ((y - start_y) * game->weapon.img.line_lenght
+                                + ((y - start_y) * game->weapon.img.line_length
                                         + (x - start_x) * (game->weapon.img.bpp / 8));
                         color = *(int *)pixel;
                         if (color != 0 && color != (int)0xFF000000)
