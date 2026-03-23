@@ -1,4 +1,3 @@
-
 #ifndef STRUCTS_H
 # define STRUCTS_H
 
@@ -52,6 +51,15 @@ typedef struct s_texture
 	char	*path;			// percorso del file XPM (per debug e ricaricamento)
 }	t_texture;
 
+typedef struct s_wall
+{
+	int			draw_start;
+	int			draw_end;
+	int			line_height;
+	int			tex_x;
+	int			y;
+}	t_wall;
+
 /*
  * t_player - Giocatore
  * Rappresenta la telecamera del giocatore nel mondo 3D.
@@ -98,9 +106,6 @@ typedef struct s_map
 	char	player_dir;		// carattere che indica l'orientamento iniziale
 }	t_map;
 
-/* ============================================================================ */
-/* STRUCT PER DDA */
-/* ============================================================================ */
 typedef struct s_dda
 {
 	int		map_x;
