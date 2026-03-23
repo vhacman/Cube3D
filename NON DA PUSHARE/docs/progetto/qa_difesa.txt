@@ -1,0 +1,499 @@
+================================================================
+    CUB3D - DOMANDE E RISPOSTE PER LA DIFESA
+    Basato sulla correction sheet 2026 + flag "Can't explain code"
+    Aggiornato al 23 marzo 2026
+================================================================
+
+================================================================
+PARTE 1 — CHECKLIST PRATICA (cosa mostrare all'esaminatore)
+================================================================
+
+D: Il repository ha un README.md alla root con tutte le sezioni?
+R: Si', il README.md contiene: prima riga in corsivo con i login,
+   sezione Description, sezione Instructions (make / make bonus /
+   ./cub3D maps/test.cub), sezione Resources con riferimenti e
+   spiegazione uso AI.
+
+---
+
+D: Come compilo il progetto?
+R: make        -> compila il mandatory, produce ./cub3D
+   make bonus  -> compila con bonus (minimap + porte), stesso eseguibile
+   make clean  -> rimuove gli oggetti
+   make fclean -> rimuove oggetti + eseguibile
+   make re     -> fclean + all
+
+---
+
+D: Il progetto compila senza re-link?
+R: Si'. La prima volta compila tutto. Se lancio make una seconda volta
+   senza modifiche, non ricompila nulla. Il Makefile usa le regole
+   implicite di dipendenza .o -> .c.
+
+---
+
+D: Come si lancia il programma?
+R: ./cub3D maps/test.cub
+   Il file deve avere estensione .cub, altrimenti il programma
+   stampa "Error\n" e termina.
+
+---
+
+D: Cosa contiene il file .cub?
+R: - NO ./textures/north.xpm    <- texture muro nord
+   - SO ./textures/south.xpm    <- texture muro sud
+   - WE ./textures/west.xpm     <- texture muro ovest
+   - EA ./textures/east.xpm     <- texture muro est
+   - F 220,100,0                <- colore pavimento (RGB)
+   - C 225,30,0                 <- colore soffitto (RGB)
+   - riga vuota
+   - griglia della mappa (1=muro, 0=vuoto, N/S/E/W=spawn giocatore)
+
+---
+
+D: Cosa fa il programma se il file .cub e' mal configurato?
+R: Stampa "Error\n" seguito dal messaggio specifico su stderr
+   e termina con exit(1). Non crasha mai.
+   Esempi:
+   - chiave sconosciuta -> "Unknown texture identifier"
+   - chiave duplicata -> "Duplicate texture definition"
+   - path inesistente -> la texture non si carica, errore
+   - colore fuori range (>255) -> "Invalid color format"
+   - mappa non chiusa -> "Map is not closed/surrounded by walls"
+   - nessun file -> "Usage: ./cub3D <map.cub>"
+   - estensione sbagliata -> "File must have .cub extension"
+
+---
+
+D: Mostrami che la finestra si apre e rimane aperta.
+R: [lanciare ./cub3D maps/test.cub] La finestra si apre con il
+   labirinto visibile. Rimane aperta fino a ESC o click sulla X.
+   Se si minimizza e si riapre, il contenuto e' identico (ridisegnato
+   ogni frame dal game loop).
+
+---
+
+D: Come si chiude il programma?
+R: Due modi:
+   1. Premere ESC -> key_press intercetta KEY_ESC (65307) e chiama
+      close_window() che libera tutta la memoria ed esce con exit(0).
+   2. Cliccare sulla X della finestra -> mlx_hook registra
+      EVENT_DESTROY_NOTIFY (17) che chiama close_window().
+
+---
+
+D: I movimenti funzionano?
+R: W / freccia SU -> avanti lungo dir_x, dir_y
+   S / freccia GIU -> indietro
+   A -> strafe sinistra (vettore perpendicolare: dir_y, -dir_x)
+   D -> strafe destra
+   Freccia SX -> rotazione sinistra (rot_speed negativo)
+   Freccia DX -> rotazione destra
+   Il movimento e' fluido perche' avviene nel game loop (render)
+   60 volte al secondo, non direttamente nell'handler del tasto.
+
+---
+
+D: Come funziona il sistema di spawn? Se metto 'N' nella mappa?
+R: Il parser trova il carattere N/S/E/W nella griglia e salva
+   la posizione in map.player_x e map.player_y.
+   init_player() converte in coordinate double (centro della cella:
+   +0.5) e imposta il vettore direzione e il piano camera:
+   N -> dir=(0,-1), plane=(0.66,0)  <- guarda verso l'alto della mappa
+   S -> dir=(0,+1), plane=(-0.66,0)
+   E -> dir=(+1,0), plane=(0,0.66)
+   W -> dir=(-1,0), plane=(0,-0.66)
+
+---
+
+D: Le texture cambiano se modifico il path nel .cub?
+R: Si'. Le texture sono caricate a runtime dal path specificato nel
+   file .cub. Se cambio il path e rilancio il programma, la texture
+   cambia. Se il path non esiste, il programma termina con errore.
+
+---
+
+D: C'e' un memory leak?
+R: No. Verifica con valgrind:
+   valgrind --leak-check=full ./cub3D maps/test.cub
+   Tutte le risorse vengono liberate in free_game():
+   - griglia mappa (free_map)
+   - texture XPM (mlx_destroy_image + free del path)
+   - immagine principale (mlx_destroy_image)
+   - arma (free_weapon)
+   - finestra (mlx_destroy_window)
+   - contesto mlx (mlx_destroy_display + free(mlx))
+   - struct t_game stessa (free)
+
+---
+
+D: Cosa succede se premo tasti a caso (stress test)?
+R: Il programma rimane stabile. key_press gestisce solo i tasti
+   noti (W/A/S/D/frecce/ESC). Tutti gli altri keycode vengono
+   ignorati (nessun else finale con comportamento strano).
+
+================================================================
+PARTE 2 — SPIEGAZIONE TECNICA (DDA + Raycasting)
+================================================================
+
+D: Cos'e' il raycasting? Spiegami in breve.
+R: E' una tecnica per simulare una vista 3D a partire da una mappa 2D.
+   Per ogni colonna di pixel dello schermo (1280 colonne), lanciamo
+   un raggio nella direzione corrispondente. Troviamo dove colpisce
+   il primo muro (DDA). La distanza al muro determina l'altezza della
+   colonna disegnata: piu' e' lontano, piu' e' bassa. Poi coloriamo
+   quella colonna con la texture del muro colpito.
+
+---
+
+D: Cos'e' il DDA (Digital Differential Analysis)?
+R: E' l'algoritmo che trova la prima cella muro colpita dal raggio.
+   Invece di controllare ogni punto del raggio (inefficiente), avanza
+   di cella in cella sulla griglia, controllando solo i bordi.
+
+   Per ogni raggio calcolo:
+   - delta_dist_x: quanto deve percorrere il raggio per passare da
+     un bordo verticale al successivo (|1 / ray_dir_x|)
+   - delta_dist_y: stesso, per i bordi orizzontali
+
+   Ad ogni passo scelgo l'asse con side_dist minore (quello che
+   raggiunge prima il prossimo bordo) e avanzo di una cella.
+   Mi fermo quando la cella e' un muro ('1' o '2').
+
+---
+
+D: Cos'e' il piano camera (room_plane)?
+R: E' un vettore perpendicolare alla direzione di sguardo che
+   definisce il campo visivo (FOV). La lunghezza del piano camera
+   (0.66) determina il FOV: arctan(0.66/1) * 2 ≈ 66 gradi.
+
+   Per ogni colonna x dello schermo, camera_x va da -1 (sinistra)
+   a +1 (destra). La direzione del raggio e':
+   ray_dir = dir + plane * camera_x
+   Cosi' la colonna centrale (x=640) guarda esattamente in avanti,
+   e le colonne ai bordi guardano ai lati.
+
+---
+
+D: Come calcoli l'altezza della colonna del muro?
+R: line_height = SCREEN_HEIGHT / perp_wall_dist
+   La distanza perpendicolare (non euclidea) evita il fish-eye effect:
+   se usassi la distanza euclidea, i muri sarebbero curvi ai bordi.
+
+   draw_start = SCREEN_HEIGHT/2 - line_height/2   <- sopra centro
+   draw_end   = SCREEN_HEIGHT/2 + line_height/2   <- sotto centro
+   I valori vengono clampati a [0, SCREEN_HEIGHT-1].
+
+---
+
+D: Cos'e' il fish-eye e come lo eviti?
+R: Se calcolo la distanza euclidea dal giocatore al punto di impatto,
+   i raggi ai bordi dello schermo sono piu' lunghi di quelli centrali,
+   anche se il muro e' parallelo. Questo crea un effetto "occhio di
+   pesce" in cui il muro sembra curvo.
+
+   Per evitarlo uso la distanza perpendicolare: la proiezione della
+   distanza sull'asse della direzione di sguardo.
+   Se il raggio colpisce un lato E/W (hit_side=0):
+     perp_dist = side_dist_x - delta_dist_x
+   Se colpisce N/S (hit_side=1):
+     perp_dist = side_dist_y - delta_dist_y
+
+---
+
+D: Come funziona il texture mapping?
+R: Una volta trovato il muro, devo sapere:
+   1. Quale texture usare (nord/sud/est/ovest):
+      - hit_side=0 e ray_dir_x>0 -> lato est -> TEX_EA
+      - hit_side=0 e ray_dir_x<0 -> lato ovest -> TEX_WE
+      - hit_side=1 e ray_dir_y>0 -> lato sud -> TEX_SO
+      - hit_side=1 e ray_dir_y<0 -> lato nord -> TEX_NO
+
+   2. La colonna orizzontale nella texture (tex_x):
+      wall_x = parte decimale della posizione di impatto sul muro.
+      Se lato E/W: wall_x = pos_y + perp_dist * ray_dir_y
+      Se lato N/S: wall_x = pos_x + perp_dist * ray_dir_x
+      wall_x = wall_x - floor(wall_x)  <- solo la parte decimale
+      tex_x = (int)(wall_x * texture_width)
+      Poi viene corretto per evitare che la texture sia specchiata
+      (se ray_dir_x>0 su lato E/W, invertiamo tex_x).
+
+   3. La riga verticale nella texture (tex_y):
+      Per ogni pixel y della colonna:
+      real_y = y + line_height/2 - SCREEN_HEIGHT/2
+      tex_y = (real_y * texture_height) / line_height
+
+---
+
+D: Come scrivi i pixel sullo schermo?
+R: MiniLibX usa un buffer di pixel in memoria. La funzione
+   my_mlx_pixel_put scrive direttamente in memoria:
+   addr = img.addr + (y * img.line_length + x * (img.bpp / 8))
+   *(int *)addr = color;
+   Non usiamo mlx_pixel_put (troppo lento, chiama syscall per ogni pixel).
+   Alla fine del frame, mlx_put_image_to_window invia tutto il buffer
+   alla finestra in una sola operazione (double buffering).
+
+---
+
+D: Come funziona il movimento senza lag (tasti fluidi)?
+R: Invece di muovere il giocatore direttamente in key_press,
+   settiamo un flag (game->keys.w = 1).
+   Nel game loop (render, chiamato ~60fps da mlx_loop_hook),
+   move_player() controlla i flag e aggiorna la posizione.
+   Cosi' il movimento e' continuo finche' il tasto e' premuto,
+   e si ferma quando viene rilasciato (key_release azzera il flag).
+
+---
+
+D: Come funziona la collision detection?
+R: is_walkable() controlla se la cella (int)x, (int)y della mappa
+   e' percorribile (diversa da '1' e '2').
+   Il movimento avviene asse per asse:
+   - Provo a spostare solo X: se e' walkable, aggiorno pos_x
+   - Provo a spostare solo Y: se e' walkable, aggiorno pos_y
+   Questo permette lo "sliding" lungo i muri (se vai in diagonale
+   verso un angolo, scivoli lungo il muro invece di fermarti).
+
+---
+
+D: Come funziona la rotazione?
+R: Applichiamo la matrice di rotazione 2D al vettore direzione
+   e al piano camera:
+   new_dir_x = dir_x * cos(rot) - dir_y * sin(rot)
+   new_dir_y = dir_x * sin(rot) + dir_y * cos(rot)
+   Stesso per room_plane_x/y.
+   Usiamo old_dir_x e old_plane_x per non sporcare i calcoli.
+   rot_speed negativo = sinistra, positivo = destra.
+
+---
+
+D: Come carichi una texture XPM?
+R: mlx_xpm_file_to_image(game->mlx, path, &width, &height)
+   Restituisce un puntatore all'immagine allocata da mlx.
+   Poi mlx_get_data_addr ci da l'indirizzo dei pixel in memoria.
+   Le texture vengono liberate con mlx_destroy_image in free_textures().
+
+---
+
+D: Cos'e' il double buffering? Perche' lo usi?
+R: Invece di disegnare direttamente sullo schermo pixel per pixel
+   (visivamente spiacevole, si vede il disegno progressivo),
+   disegnamo tutto su un buffer in memoria (game->img) e poi
+   inviamo il buffer completo alla finestra con una sola chiamata
+   mlx_put_image_to_window. Cosi' ogni frame appare istantaneamente
+   e completo, senza flickering.
+
+---
+
+D: Perche' usi calloc invece di malloc?
+R: Il subject 42 richiede calloc per tutte le allocazioni.
+   calloc azzera automaticamente la memoria allocata.
+   Questo evita l'uso di memoria non inizializzata (undefined behavior)
+   e semplifica il codice (non bisogna azzerare manualmente ogni campo).
+
+================================================================
+PARTE 3 — DOMANDE SULLE STRUTTURE DATI
+================================================================
+
+D: Spiegami la struttura t_game.
+R: E' la struttura centrale che contiene tutto lo stato del gioco.
+   Viene passata per puntatore a tutte le funzioni.
+   Campi principali:
+   - mlx: handle MiniLibX (connessione al display X11)
+   - win: handle della finestra
+   - img: buffer principale per il rendering (double buffering)
+   - textures[4]: array delle 4 texture muri (NO=0, SO=1, WE=2, EA=3)
+   - map: griglia 2D, dimensioni, posizione spawn giocatore
+   - player: posizione, direzione, piano camera, dati DDA
+   - keys: flag tasti premuti (per movimento fluido)
+   - floor_color, ceiling_color: colori in formato 0x00RRGGBB
+   - weapon: immagine dell'arma (sovrapposta alla scena)
+
+---
+
+D: Perche' t_player ha room_plane_x e room_plane_y invece di "plane"?
+R: "plane" e' una keyword riservata in C (non standard ma comune).
+   Per evitare conflitti abbiamo usato room_plane_x e room_plane_y.
+
+---
+
+D: Cos'e' hit_side in t_player?
+R: Indica quale lato del muro e' stato colpito dal DDA:
+   0 = lato est o ovest (il raggio ha attraversato un bordo verticale)
+   1 = lato nord o sud (il raggio ha attraversato un bordo orizzontale)
+   Usato per scegliere la texture corretta e calcolare la distanza
+   perpendicolare.
+
+---
+
+D: Come memorizzi la mappa?
+R: Come array di stringhe (char **grid), NULL-terminato.
+   Ogni stringa e' una riga della mappa.
+   Le righe possono avere lunghezze diverse (non tutte le righe
+   hanno la stessa lunghezza nel file .cub).
+   map.height = numero di righe, map.width = lunghezza massima.
+
+---
+
+D: Come validi che la mappa e' chiusa?
+R: validate_map() scorre ogni cella percorribile (0, N, S, E, W).
+   Per ogni cella percorribile chiama check_surroundings() che
+   controlla i 4 vicini cardinali.
+   Se un vicino e' ' ' (spazio) o fuori dai limiti della mappa,
+   la mappa e' aperta -> errore.
+   I muri ('1') non vengono controllati: un muro che tocca il bordo
+   e' accettabile.
+
+================================================================
+PARTE 4 — DOMANDE SUL PARSER
+================================================================
+
+D: Come leggi il file .cub?
+R: parse_file() apre il file con open(fd, O_RDONLY).
+   read_all_lines() usa get_next_line() (da libft) per leggere
+   riga per riga e accumula in un array NULL-terminato.
+   Poi process_lines() fa due passaggi:
+   1. Header: righe che iniziano con NO/SO/WE/EA/F/C -> parse_texture/parse_color
+   2. Mappa: tutto il resto -> parse_map
+
+---
+
+D: Come distingui la fine dell'header dall'inizio della mappa?
+R: is_header_line() riconosce le righe che iniziano con
+   "NO ", "SO ", "WE ", "EA ", "F ", "C ".
+   process_lines() scorre finche' trova righe vuote o di header.
+   La prima riga che non e' ne' vuota ne' header = inizio mappa.
+   Non c'e' un separatore esplicito nel formato .cub.
+
+---
+
+D: Come validi i colori RGB?
+R: is_valid_uint_str() controlla che ogni componente sia una stringa
+   di sole cifre (0-9), non vuota.
+   Poi ft_atoi() converte e controlliamo che sia tra 0 e 255.
+   create_color() combina i 3 valori: (r << 16 | g << 8 | b).
+
+================================================================
+PARTE 5 — BONUS
+================================================================
+
+D: Come funziona la minimap?
+R: render_minimap() viene chiamata ogni frame in render_bonus.c,
+   dopo raycast() e prima di mlx_put_image_to_window.
+   Disegna direttamente nel buffer img (game->img) nell'angolo
+   in alto a sinistra, sovrapposta alla scena 3D.
+   draw_mm_grid() scorre la mappa e disegna ogni cella come un
+   quadrato MINIMAP_SCALE x MINIMAP_SCALE pixel con colore
+   diverso per muri/pavimento/porte.
+   draw_mm_player() disegna un punto rosso 2x2 alla posizione del
+   giocatore e una linea gialla nella direzione di sguardo.
+
+---
+
+D: Come funzionano le porte?
+R: Le porte sono celle con carattere '2' nella griglia.
+   - Il DDA si ferma su '2' come su '1' (muro).
+   - is_walkable() rifiuta '2' (non ci si puo' camminare dentro).
+   - Premendo E (KEY_E=101) viene chiamata handle_doors():
+     get_front_cell() calcola la cella di fronte al giocatore
+     (pos_x + dir_x, pos_y + dir_y), se e' '2' la sostituisce con '0'.
+     Da quel momento il DDA e is_walkable la trattano come pavimento.
+   - La modifica e' permanente per la sessione (la porta non si richiude).
+
+---
+
+D: Perche' hai due file render_bonus.c e render.c?
+R: La norminette v4.1 vieta le direttive #ifdef dentro i corpi
+   delle funzioni. Non possiamo fare:
+   render() { ... #ifdef BONUS render_minimap(); #endif ... }
+   Soluzione: due file separati con la stessa funzione render().
+   - src/render/render.c: versione mandatory (senza minimap)
+   - src/bonus/render_bonus.c: versione bonus (con minimap)
+   Il Makefile compila render.c per make, render_bonus.c per make bonus.
+   Stesso principio per keys.c / keys_bonus.c.
+
+---
+
+D: Hai wall collisions?
+R: Si', e' implementato in is_walkable() + il movimento asse per asse
+   in move_forward_back() e move_strafe().
+   Il collision check e' fatto separatamente per X e Y, permettendo
+   lo sliding lungo i muri.
+
+================================================================
+PARTE 6 — DOMANDE TRABOCCHETTO
+================================================================
+
+D: Perche' usi exit(0) invece di return in close_window?
+R: close_window() viene chiamata da mlx_hook come callback.
+   mlx_loop() e' un loop infinito: non c'e' modo di farlo terminare
+   con un semplice return. exit(0) termina il processo direttamente
+   dopo aver liberato tutta la memoria con free_game().
+
+---
+
+D: Perche' non usi mlx_pixel_put?
+R: mlx_pixel_put fa una syscall per ogni singolo pixel.
+   Con 1280x720 pixel per frame a 60fps = 55 milioni di syscall
+   al secondo -> programma inutilizzabile.
+   Il nostro metodo scrive direttamente in memoria (tramite addr)
+   e manda tutto alla finestra in una sola chiamata finale.
+
+---
+
+D: Cosa succede se il giocatore guarda un muro da vicino?
+R: Se perp_wall_dist e' molto piccola (quasi 0), line_height
+   diventerebbe enorme. Gestiamo il caso con:
+   if (perp_wall_dist <= 0) perp_wall_dist = 0.0001;
+   Evita la divisione per zero e l'overflow.
+
+---
+
+D: Perche' aggiungi 0.5 alla posizione iniziale del giocatore?
+R: Le coordinate del giocatore sono in virgola mobile.
+   map.player_x e player_y sono le coordinate intere della cella
+   dove si trova il carattere N/S/E/W.
+   Aggiungiamo 0.5 per posizionare il giocatore al centro della
+   cella (non nell'angolo), evitando collisioni immediate con i muri.
+
+---
+
+D: Cosa fa free(mlx) in create_window?
+R: mlx_init() alloca internamente con malloc il contesto MLX.
+   Se mlx_new_window fallisce, dobbiamo liberare quel blocco prima
+   di uscire, altrimenti e' un memory leak.
+   La sequenza corretta e':
+   mlx_destroy_display(mlx) -> chiude la connessione X11
+   free(mlx)                -> libera il blocco di memoria
+   Senza free(mlx) ci sarebbe un leak di memoria del contesto MLX.
+
+---
+
+D: Perche' i flag tasti sono int e non char o bool?
+R: Per semplicita' con la norminette (non c'e' bool nativo in C89/C90
+   senza stdbool.h). 0 = non premuto, 1 = premuto.
+   int e' il tipo naturale per le operazioni booleane in C.
+
+---
+
+D: Come gestisci le righe della mappa di lunghezze diverse?
+R: Le righe vengono duplicate con ft_strdup e memorizzate com'e' sono
+   (senza padding). get_cell() in validate_map usa ft_strlen per
+   controllare i limiti di ogni riga prima di accedere.
+   Questo permette mappe non rettangolari (comuni nei file .cub reali).
+
+================================================================
+PARTE 7 — COSA NON DOBBIAMO SAPER SPIEGARE
+================================================================
+
+NON dobbiamo implementare (stub / non richiesto mandatory):
+- Sprite rendering (sprites.c e' uno stub con (void)game)
+- Rotazione mouse (mouse_bonus.c e' stub di Ilaria)
+- Sprite animati (sprites_anim_bonus.c e' stub di Ilaria)
+
+Se chiede di queste funzioni:
+"E' uno stub richiesto dal linker per il bonus. L'implementazione
+reale era assegnata al mio partner e non e' ancora completata."
+
+================================================================

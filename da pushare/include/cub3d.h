@@ -1,0 +1,337 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cub3d.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vhacman <vhacman@student.42roma.it>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/23 15:00:47 by vhacman           #+#    #+#             */
+/*   Updated: 2026/03/23 15:00:47 by vhacman          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef CUB3D_H
+# define CUB3D_H
+
+/* INCLUDES */
+
+# include <mlx.h>
+# include <fcntl.h>
+# include "../libft/includes/libft.h"
+# include "../libft/includes/get_next_line.h"
+# include "structs.h"
+# include "defines.h"
+
+/* PROTOTIPI DELLE FUNZIONI */
+
+/* 
+ * FUNZIONI DI INIZIALIZZAZIONE
+ */
+
+/*
+ * Inizializza il gioco
+ * Parametri: percorso del file .cub da leggere
+ * Cosa fa: alloca t_game, init mlx, parsing file, carica 
+ * texture, init mappa e giocatore
+ * Restituisce: puntatore a t_game, NULL se errore
+ * File: src/main.c
+ */
+t_game	*init_game(char *cub_path);
+
+/* 
+ * FUNZIONI DI PARSING
+ */
+
+/*
+ * Parsa l'intero file .cub
+ * Parametri: puntatore a t_game, percorso del file .cub
+ * Cosa fa: apre e legge il file riga per riga, identifica 
+ * elementi, valida e memorizza
+ * Restituisce: 0 se ok, 1 se errore
+ * File: src/parser/parse_file.c
+ */
+int		parse_file(t_game *game, char *cub_path);
+
+/*
+ * Parsa le texture dei muri
+ * Parametri: puntatore a t_game, riga del file .cub
+ * Cosa fa: estrae id e percorso XPM, verifica esistenza
+ * Restituisce: 0 se ok, 1 se errore
+ * File: src/parser/parse_textures.c
+ */
+int		parse_texture(t_game *game, char *line);
+
+/*
+ * Parsa i colori
+ * Parametri: puntatore a t_game, riga del file .cub
+ * Cosa fa: estrae identificatore F/C, estrae RGB, 
+ * valida range 0-255, converte in colore
+ * Restituisce: 0 se ok, 1 se errore
+ * File: src/parser/parse_colors.c
+ */
+int		parse_color(t_game *game, char *line);
+
+/*
+ * Parsa la mappa
+ * Parametri: puntatore a t_game, array di righe
+ * Cosa fa: legge righe successive, costruisce griglia 2D, 
+ * trova posizione giocatore
+ * Restituisce: 0 se ok, 1 se errore
+ * File: src/parser/parse_map.c
+ */
+int		parse_map(t_game *game, char **lines);
+
+/*
+ * Valida la mappa
+ * Parametri: puntatore a t_game
+ * Cosa fa: controlla mappa chiusa, esattamente un 
+ * giocatore, caratteri validi
+ * Restituisce: 0 se valida, 1 se non valida
+ * File: src/parser/validate_map.c
+ */
+int		validate_map(t_game *game);
+
+/* 
+ * FUNZIONI DI RAY-CASTING
+ */
+
+int		is_walkable(t_game *game, double x, double y);
+void	rotate_player(t_game *game, double rot_speed);
+void	move_forward_back(t_game *game, int direction);
+void	move_strafe(t_game *game, int direction);
+void	move_player(t_game *game);
+double	perform_dda(t_game *game, int x);
+
+/*
+ * Esegue il ray-casting per un frame
+ * Parametri: puntatore a t_game
+ * Cosa fa: per ogni colonna x, calcola direzione raggio, 
+ * esegue DDA, disegna striscia
+ * File: src/raycaster/raycaster.c
+ */
+void	raycast(t_game *game);
+
+/*
+ * Algoritmo DDA
+ * Parametri: puntatore a t_game, indice colonna x
+ * Cosa fa: calcola deltaDist, sideDist, loop fino a 
+ * muro, restituisce distanza perpendicolare
+ * Restituisce: distanza perpendicolare al muro
+ * File: src/raycaster/dda.c
+ */
+double	perform_dda(t_game *game, int x);
+
+/*
+ * Muove il giocatore
+ * Parametri: puntatore a t_game
+ * Cosa fa: controlla flag tasti, muove 
+ * avanti/indietro/spostamento laterale, ruota
+ * File: src/raycaster/player_move.c
+ */
+void	move_player(t_game *game);
+
+/* 
+ * FUNZIONI DI RENDERING
+ */
+
+int		load_all_textures(t_game *game);
+t_texture		*get_texture(t_game *game, int side);
+int		get_tex_pixel(t_texture *tex, int tex_x, int tex_y);
+int		get_tex_x(t_game *game, t_texture *tex, int side, double perp_dist);
+int		load_weapon(t_game *game);
+void	draw_weapon(t_game *game);
+void	free_weapon(t_game *game);
+
+/*
+ * Rendering principale
+ * Parametri: puntatore a t_game
+ * Cosa fa: pulisce immagine, esegue ray-casting, 
+ * gestisce sprite, mette immagine in finestra
+ * File: src/render/render.c
+ */
+int		render(t_game *game);
+
+/*
+ * Disegna le colonne dei muri
+ * Parametri: puntatore a t_game, indice colonna x, 
+ * distanza, lato
+ * Cosa fa: calcola altezza colonna, punto 
+ * iniziale/finale, seleziona texture, applica
+ * File: src/render/draw_walls.c
+ */
+void	draw_wall(t_game *game, int x, double perp_wall_dist, int side);
+
+/*
+ * Disegna pavimento e soffitto
+ * Parametri: puntatore a t_game
+ * Cosa fa: riempie meta superiore con ceiling_color, 
+ * meta inferiore con floor_color
+ * File: src/render/draw_floor_ceiling.c
+ */
+void	draw_floor_ceiling(t_game *game);
+
+/*
+ * Carica una texture
+ * Parametri: puntatore a miniLibX, percorso file XPM
+ * Cosa fa: carica file XPM, ottiene indirizzo pixel
+ * Restituisce: puntatore a t_img, NULL se errore
+ * File: src/render/textures.c
+ */
+int		load_texture(t_game *game, t_texture *tex, char *path);
+
+/*
+ * Rendering degli sprite
+ * Parametri: puntatore a t_game
+ * Cosa fa: calcola distanza sprite, ordina per distanza
+ * File: src/render/sprites.c
+ */
+void	render_sprites(t_game *game);
+
+/*
+ * FUNZIONI DI EVENTI
+ */
+
+/*
+ * Inizializza miniLibX
+ * File: src/events/events.c
+ */
+void	*init_mlx(void);
+
+/*
+ * Crea la finestra di gioco
+ * File: src/events/events.c
+ */
+void	*create_window(void *mlx);
+
+/*
+ * Registra tutti gli hook (tasti, finestra, game loop)
+ * File: src/events/events.c
+ */
+void	setup_hooks(t_game *game);
+
+/*
+ * Avvia il loop principale degli eventi
+ * File: src/events/events.c
+ */
+void	start_loop(t_game *game);
+
+/*
+ * Inizializza lo stato dei tasti a 0
+ * File: src/events/keys.c
+ */
+void	init_keys(t_game *game);
+
+/*
+ * Crea l'immagine di rendering (buffer)
+ * File: src/render/render.c
+ */
+void	init_image(t_game *game);
+
+/*
+ * Gestore del click sulla X
+ * Parametri: puntatore a t_game
+ * Cosa fa: libera memoria, esce con exit(0)
+ * Restituisce: 0 (convenzione mlx_hook)
+ * File: src/events/events.c
+ */
+int		close_window(t_game *game);
+
+/*
+ * Gestore del tasto premuto
+ * Parametri: codice del tasto, puntatore a t_game
+ * Cosa fa: imposta flag corrispondente, se ESC chiude
+ * Restituisce: 0
+ * File: src/events/keys.c
+ */
+int		key_press(int keycode, t_game *game);
+
+/*
+ * Gestore del tasto rilasciato
+ * Parametri: codice del tasto, puntatore a t_game
+ * Cosa fa: azzera flag corrispondente
+ * Restituisce: 0
+ * File: src/events/keys.c
+ */
+int		key_release(int keycode, t_game *game);
+
+/* 
+ * FUNZIONI DI UTILITA
+ */
+
+/* Libera un array di stringhe
+ * Parametri: array di stringhe (char **)
+ * Cosa fa: libera ogni stringa e l'array stesso
+ * File: src/utils/utils.c
+ */
+void	free_str_array(char **arr);
+
+/* Libera un puntatore e lo imposta a NULL
+ * Parametri: puntatore a puntatore (void**)
+ * Cosa fa: libera e imposta a NULL
+ * File: src/utils/utils.c
+ */
+void	safe_free(void **ptr);
+
+/* UTILITY PER IL PARSER
+ * File: src/utils/parser_utils.c
+ */
+
+/* Legge tutte le righe di fd in un array terminato da NULL */
+char	**read_all_lines(int fd);
+
+/* Controlla se una riga e di tipo header (NO/SO/WE/EA/F/C) */
+int		is_header_line(char *line);
+
+/* Salta spazi e tab iniziali, restituisce puntatore al primo char */
+char	*skip_whitespace(char *line);
+
+/* Rimuove '\n' finale dalla stringa (in-place) */
+void	trim_newline(char *line);
+
+/* Controlla che la stringa contenga solo cifre decimali (no segno) */
+int		is_valid_uint_str(char *s);
+
+/* Conta gli elementi non-NULL in un array NULL-terminato */
+int		count_str_array(char **arr);
+
+/*
+ * Crea un colore
+ * Parametri: componenti red, green, blue (0-255)
+ * Restituisce: colore nel formato 0x00RRGGBB
+ * File: src/utils/color_utils.c
+ */
+int		create_color(int r, int g, int b);
+void	free_game(t_game *game);
+
+/* 
+ * FUNZIONI BONUS
+ */
+
+/*
+ * Rendering minimappa
+ * File: src/bonus/minimap_bonus.c
+ */
+void	render_minimap(t_game *game);
+
+/*
+ * Gestione porte
+ * File: src/bonus/doors_bonus.c
+ */
+void	handle_doors(t_game *game);
+
+/*
+ * Rotazione con il mouse
+ * File: src/bonus/mouse_bonus.c
+ */
+int		mouse_move(int x, int y, t_game *game);
+
+/*
+ * Sprite animato
+ * File: src/bonus/sprites_anim_bonus.c
+ */
+void	render_animated_sprites(t_game *game);
+
+void	error_exit(t_game *game, char *message);
+void	my_mlx_pixel_put(t_img *img, int x, int y, int color);
+
+#endif
