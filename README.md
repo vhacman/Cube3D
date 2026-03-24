@@ -8,8 +8,6 @@
 
 cub3D is a first-person 3D maze game built using ray-casting technology, inspired by the classic Wolfenstein 3D. This implementation, titled "Cyber Escape," puts players in the role of an awakened resistance fighter trapped inside the Matrix—a virtual prison created by the NeoCorp corporation.
 
-The player must navigate through a three-level virtual labyrinth, avoiding enemy Glitches and Security IA units, to reach the Core and destroy the Matrix generator, freeing humanity from digital captivity.
-
 ### Core Features
 
 - **Ray-casting engine**: Real-time 3D rendering using DDA algorithm
