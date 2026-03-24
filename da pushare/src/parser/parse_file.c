@@ -62,12 +62,11 @@ static int	process_lines(t_game *game, char **lines)
 		error_exit(game, "No map found in file");
 		return (1);
 	}
+	game->raw_lines = lines;
 	if (parse_map(game, lines + i))
-	{
-		free_str_array(lines);
 		return (1);
-	}
 	free_str_array(lines);
+	game->raw_lines = NULL;
 	return (0);
 }
 
