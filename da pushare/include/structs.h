@@ -6,7 +6,7 @@
 /*   By: vhacman <vhacman@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/23 14:56:57 by vhacman           #+#    #+#             */
-/*   Updated: 2026/03/23 14:56:57 by vhacman          ###   ########.fr       */
+/*   Updated: 2026/03/24 16:02:30 by vhacman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,7 @@ typedef struct s_game
 	int			floor_color;	// colore del pavimento (formato 0x00RRGGBB)
 	int			ceiling_color;	// colore del soffitto
 	t_weapon	weapon;
-
+	char		**raw_lines;
 	/* TODO: Bonus (da aggiungere quando implementati):
 	 * - z_buffer: array delle distanze dei muri per ogni colonna (per sprite)
 	 * - sprites: array degli sprite nella mappa

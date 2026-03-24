@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: vhacman <vhacman@student.42.fr>            +#+  +:+       +#+         #
+#    By: vhacman <vhacman@student.42roma.it>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/03/05 21:12:49 by vhacman           #+#    #+#              #
-#    Updated: 2026/03/23 00:00:00 by vhacman          ###   ########.fr        #
+#    Updated: 2026/03/24 15:43:22 by vhacman          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,8 +32,8 @@ LIBFT       = $(LIBFT_DIR)/libft.a
 
 # MiniLibX (Linux)
 MLX_DIR     = minilibx-linux
-MLX         = $(MLX_DIR)/libmlx.a
-MLX_FLAGS = -L$(MLX_DIR) -lmlx_Linux -lXext -lX11 -lm
+MLX         = $(MLX_DIR)/libmlx_Linux.a
+MLX_FLAGS   = -L$(MLX_DIR) -lmlx_Linux -lXext -lX11 -lm
 
 # Sources mandatory (senza file bonus)
 SRCS        = $(SRC_DIR)/main.c \
@@ -80,7 +80,7 @@ OBJS_BONUS  = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR_BONUS)/%.o, $(SRCS_BONUS))
 #                                  RULES                                       #
 # **************************************************************************** #
 
-all: $(LIBFT) $(NAME)
+all: $(LIBFT) $(MLX) $(NAME)
 
 $(NAME): $(OBJS)
 	@$(CC) $(CFLAGS) $(OBJS) -I$(INC_DIR) -I$(LIBFT_DIR)/includes \
@@ -95,8 +95,11 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 $(LIBFT):
 	@$(MAKE) -C $(LIBFT_DIR)
 
+$(MLX):
+	@$(MAKE) -C $(MLX_DIR)
+
 # Regola bonus: compila in obj_bonus/ con -DBONUS
-bonus: $(LIBFT) $(OBJS_BONUS)
+bonus: $(LIBFT) $(MLX) $(OBJS_BONUS)
 	@$(CC) $(CFLAGS) $(OBJS_BONUS) -I$(INC_DIR) -I$(LIBFT_DIR)/includes \
 		-L$(LIBFT_DIR) -lft $(MLX_FLAGS) -o $(NAME)
 	@echo "✅ $(NAME) with bonuses compiled successfully."

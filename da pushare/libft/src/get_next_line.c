@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vhacman <vhacman@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 08:20:00 by vhacman           #+#    #+#             */
-/*   Updated: 2025/02/24 23:00:10 by vhacman          ###   ########.fr       */
+/*   Updated: 2026/03/24 15:46:13 by vhacman          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,14 @@ char	*get_next_line(int fd)
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
+	{
+		if (raw_input_data)
+		{
+			free(raw_input_data);
+			raw_input_data = NULL;
+		}
 		return (NULL);
+	}
 	raw_input_data = get_next_line_reader(fd, raw_input_data);
 	if (!raw_input_data || !*raw_input_data)
 	{
@@ -150,3 +157,4 @@ char	*get_next_line(int fd)
 	line = extract_line(&raw_input_data);
 	return (line);
 }
+
