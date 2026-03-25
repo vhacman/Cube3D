@@ -1,0 +1,216 @@
+================================================================
+              CUB3D - GUIDA GIT PER GABRIELA E ILARIA
+================================================================
+
+Struttura dei branch:
+  main
+  └── develop
+      ├── gabriela   ← branch di Gabriela
+      └── ilaria     ← branch di Ilaria
+
+Regola base:
+  - Gabriela lavora SEMPRE sul branch "gabriela"
+  - Ilaria lavora SEMPRE sul branch "ilaria"
+  - Quando una parte è pronta e testata → si fa merge su "develop"
+  - "main" si tocca solo alla fine per la consegna
+
+================================================================
+PRIMA VOLTA — SETUP INIZIALE (da fare una volta sola)
+================================================================
+
+1. Clona il repository (se non l'hai già):
+   git clone <url-del-repo>
+   cd Cube3D
+
+2. Scarica tutti i branch dal remote:
+   git fetch --all
+
+3. Gabriela: vai sul tuo branch
+   git checkout gabriela
+
+4. Ilaria: vai sul tuo branch
+   git checkout ilaria
+   git switch ilaria 
+
+================================================================
+FLUSSO DI LAVORO QUOTIDIANO
+================================================================
+
+--- PASSO 1: Prima di iniziare a lavorare ---
+Aggiorna sempre il tuo branch con le ultime modifiche di develop:
+
+  git checkout gabriela          (o ilaria)
+  git pull origin gabriela       (scarica le tue ultime modifiche)
+  git merge develop              (incorpora le novità di develop)
+
+Se ci sono conflitti, Git te lo dice. Risolvi il file,
+poi fai: git add <file> && git commit -m "fix: risolto conflitto"
+
+--- PASSO 2: Lavora sui tuoi file ---
+Modifica, scrivi, testa il codice normalmente.
+
+--- PASSO 3: Salva le modifiche (commit) ---
+
+Vedi cosa hai modificato:
+  git status
+
+Aggiungi i file che vuoi salvare:
+  git add src/parser/parse_file.c
+  git add src/parser/parse_map.c
+  (oppure aggiungi tutto in una volta: git add .)
+
+Crea il commit con un messaggio descrittivo:
+  git commit -m "feat: aggiunto parser del file .cub"
+
+Esempi di messaggi commit:
+  git commit -m "feat: aggiunto parsing colori F e C"
+  git commit -m "fix: corretto errore validazione mappa"
+  git commit -m "feat: completato validate_map con flood-fill"
+  git commit -m "fix: memory leak in ft_free"
+  git commit -m "wip: parser a metà, da continuare"
+
+--- PASSO 4: Carica le modifiche sul remote ---
+
+  git push origin gabriela       (o ilaria)
+
+================================================================
+QUANDO UNA FEATURE È PRONTA → MERGE SU DEVELOP
+================================================================
+
+Quando hai finito una parte e l'hai testata, la porti su develop.
+
+1. Assicurati che il tuo branch sia aggiornato e pushato:
+   git push origin gabriela
+
+2. Vai su develop:
+   git checkout develop
+
+3. Aggiorna develop dal remote:
+   git pull origin develop
+
+4. Fai il merge del tuo branch:
+   git merge gabriela
+
+5. Se tutto va bene, pusha develop:
+   git push origin develop
+
+6. Torna sul tuo branch per continuare a lavorare:
+   git checkout gabriela
+
+================================================================
+ESEMPIO PRATICO — SESSIONE DI LAVORO DI GABRIELA
+================================================================
+
+Scenario: Gabriela ha scritto parse_file.c e vuole salvarlo.
+
+  # 1. Vai sul tuo branch
+  git checkout gabriela
+
+  # 2. Aggiorna con le ultime novità
+  git pull origin gabriela
+  git merge develop
+
+  # 3. Lavora su parse_file.c ...
+  # (scrivi il codice)
+
+  # 4. Vedi cosa hai cambiato
+  git status
+
+  # 5. Aggiungi il file
+  git add src/parser/parse_file.c
+
+  # 6. Commit
+  git commit -m "feat: aggiunto parse_file.c con controllo estensione .cub"
+
+  # 7. Pusha sul remote
+  git push origin gabriela
+
+  # --- Più tardi, quando parse_file.c è testato e funziona ---
+
+  # 8. Vai su develop
+  git checkout develop
+
+  # 9. Aggiorna develop
+  git pull origin develop
+
+  # 10. Merge del tuo branch
+  git merge gabriela
+
+  # 11. Pusha develop
+  git push origin develop
+
+  # 12. Torna al tuo branch
+  git checkout gabriela
+
+================================================================
+ESEMPIO PRATICO — SESSIONE DI LAVORO DI ILARIA
+================================================================
+
+Scenario: Ilaria ha scritto dda.c e vuole salvarlo.
+
+  git checkout ilaria
+  git pull origin ilaria
+  git merge develop
+  # (lavora su dda.c)
+  git add src/raycaster/dda.c
+  git commit -m "feat: implementato algoritmo DDA completo"
+  git push origin ilaria
+
+  # Quando è pronto per develop:
+  git checkout develop
+  git pull origin develop
+  git merge ilaria
+  git push origin develop
+  git checkout ilaria
+
+================================================================
+COMANDI UTILI
+================================================================
+
+Vedere su quale branch sei:
+  git branch
+
+Vedere la storia dei commit:
+  git log --oneline
+
+Vedere le differenze non ancora committate:
+  git diff
+
+Annullare modifiche a un file (ATTENZIONE: perdi le modifiche!):
+  git checkout -- <nomefile>
+
+Vedere tutti i branch (locali e remote):
+  git branch -a
+
+Scaricare aggiornamenti senza fare merge:
+  git fetch origin
+
+================================================================
+REGOLE D'ORO
+================================================================
+
+1. NON lavorare mai direttamente su "main" o "develop"
+2. Fai commit spesso, con messaggi chiari
+3. Prima di fare merge su develop, testa che il codice compili
+4. Se non sei sicura di qualcosa, chiedi prima di fare merge
+5. Aggiorna sempre il tuo branch con develop prima di iniziare
+6. Non fare force push (git push --force) su develop o main
+
+================================================================
+ALLA FINE — MERGE SU MAIN PER LA CONSEGNA
+================================================================
+
+Solo quando tutto è pronto, testato e norminette ok:
+
+  git checkout main
+  git pull origin main
+  git merge develop
+  git push origin main
+
+Poi verifica che funzioni tutto da zero:
+  git clone <url-repo> /tmp/test_cub3D
+  cd /tmp/test_cub3D
+  make
+  ./cub3D maps/test.cub
+
+================================================================

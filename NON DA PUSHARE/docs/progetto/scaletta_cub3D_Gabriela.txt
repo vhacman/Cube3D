@@ -1,0 +1,170 @@
+CUB3D - La mia scaletta di lavoro
+Gabriela | Partner: Ilaria
+
+Disponibilità mia:
+- lunedì/martedì/mercoledì/giovedì sera: 2 ore
+- sabato mattina: 4 ore
+- venerdì/sabato/domenica sera: non disponibile (almeno fino al 15 marzo)
+Inizio: sabato 8 marzo
+
+Ilaria gestisce il suo tempo da sola, ci coordiniamo man mano.
+
+---
+
+FASE 1 — 8-13 marzo (studio + setup + parser base) ✅ COMPLETATA
+
+sabato 8 marzo (4h) ✅
+- leggere teoria_cub3D.txt
+- leggere tutorial Lodev (sezione ray-casting base)
+- capire il DDA su carta con un esempio
+- provare il gioco originale
+
+lunedì 10 marzo (2h) ✅
+- scrivere le struct principali in include/structs.h
+- scrivere le costanti in include/defines.h
+
+martedì 11 marzo (2h) ✅
+- scrivere i prototipi in include/cub3d.h
+- verificare che il Makefile compili senza errori
+- scrivere src/utils/error.c
+
+mercoledì 12 marzo (2h) ✅
+- scrivere src/parser/parse_file.c (fatto da Ilaria)
+
+giovedì 13 marzo (2h) ✅
+- scrivere src/parser/parse_textures.c (fatto da Ilaria)
+- scrivere src/parser/parse_colors.c (fatto da Ilaria)
+
+---
+
+FASE 2 — 15-22 marzo (parser completo + sprite + memoria) ✅ COMPLETATA
+
+sabato 15 marzo (4h) ✅
+- scrivere src/parser/parse_map.c (fatto da Ilaria)
+- scrivere src/parser/validate_map.c (fatto da Ilaria)
+
+lunedì 17 marzo (2h) ✅
+- testare il parser con file .cub validi e invalidi
+
+martedì 18 marzo (2h) ✅
+- fix bug parser
+- struttura base src/utils/free.c
+
+mercoledì 19 marzo (2h) ✅
+- test intermedio con Ilaria: finestra, movimento, muri 3D
+
+giovedì 20 marzo (2h) ✅
+- texture XPM trovate (cartella textures/)
+- maps/test.cub aggiornato
+
+sabato 22 marzo (4h) ✅
+- src/render/sprites.c (stub render_sprites implementato)
+- merge branch ilaria → gabriela
+
+---
+
+FASE 3 — 23-29 marzo (bonus + norminette + QA) 🚧 IN CORSO
+
+lunedì 23 marzo ✅
+- BONUS: src/bonus/minimap_bonus.c — minimap 2D overlay con posizione e direzione giocatore
+- BONUS: src/bonus/doors_bonus.c — porte apribili con tasto E (carattere '2' in mappa)
+- BONUS: stubs mouse_bonus.c e sprites_anim_bonus.c (per Ilaria)
+- Modifiche collegate: validate_map, player_move, dda, defines, Makefile
+- Commenti autore/perché/come su tutti i file bonus
+- Fix memory leak: create_window (mlx non liberato) e free_weapon (img.img non azzerato)
+- NORMINETTE v4.1 — pass completo su tutti i file:
+  * main.c: estratto set_player_vectors() (init_player era >25 righe)
+  * keys.c: rimosso #ifdef BONUS da corpo funzione
+  * render.c: rimosso #ifdef BONUS da corpo funzione
+  * Creati render_bonus.c e keys_bonus.c (versioni bonus separate)
+  * minimap_bonus.c: inlinato fill_mm_row (6→5 funzioni)
+  * parser_utils.c: ridotto a 5 funzioni; creato parser_utils2.c
+  * free.c: spostato safe_free in utils.c (era 6 funzioni, ora 5)
+  * draw_walls/floor_ceiling/textures/weapon.c: tabs al posto degli spazi
+  * weapon.c: rimosso ~ spurio a fine file
+  * events.c: riscritto — rimossi commenti standalone in corpi funzione
+  * error.c, validate_map.c, dda.c, player_move.c: rimossi commenti in funzioni
+  * player_move.c: sostituiti caratteri non-ASCII (è → e')
+  * utils.c: corretta doppia riga vuota
+  * Makefile: aggiunto parser_utils2.c; SRCS_BONUS con filter-out
+
+martedì 24 marzo ⏳ ← PUSH ALL'80 (CONSEGNA FINALE)
+- compilare su Linux: make + make bonus senza errori né warning
+- test rapido funzionalità base (finestra, movimento, muri, ESC)
+- valgrind — conferma zero leak
+- test error management essenziale
+- PUSH ALL'80
+
+mercoledì 25 marzo ⏳
+- test error management:
+  argomenti casuali → nessun crash
+  tastiera casuale → programma stabile
+  mappa modificata → comportamento corretto o errore
+
+giovedì 26 marzo ⏳
+- fix bug trovati nei test
+
+venerdì 28: non disponibile
+
+sabato 29 marzo ⏳
+- test completo con la correction sheet (mandatory + bonus):
+  nome eseguibile, file configurazione, display, eventi,
+  movimenti, muri, minimap, porte, error management
+- verifica: git clone + make funziona in cartella vuota
+
+---
+
+FASE 4 — 30 marzo - 5 aprile (fix finali + consegna) ⏳
+
+lunedì 31 marzo ⏳
+- fix tutti i bug trovati nel test correction sheet
+
+martedì 1 aprile ⏳
+- aggiornare l'header 42 con le date reali su tutti i miei file
+
+mercoledì 2 aprile ⏳
+- test bonus con Ilaria: minimap, porte, mouse (se completato da Ilaria)
+
+giovedì 3 aprile ⏳
+- norminette finale su tutti i file (dopo eventuali modifiche post-QA)
+
+venerdì 4: non disponibile
+
+sabato 5 aprile ⏳
+- test finale completo (mandatory + bonus)
+- verifica nessun memory leak
+- verifica nessun crash
+- push su repository Git
+- verifica: git clone + make funziona in cartella vuota
+
+---
+
+TOTALE ORE MIE: circa 52 ore
+CONSEGNA: 24 marzo 2026 (push all'80)
+
+---
+
+I MIEI FILE (Gabriela):
+- include/structs.h, defines.h, cub3d.h
+- src/main.c (set_player_vectors, init_player, check_elements, init_game, main)
+- src/utils/error.c, free.c, utils.c (create_color + safe_free)
+- src/render/sprites.c
+- texture XPM (N/S/E/W) + maps/test.cub
+- src/bonus/minimap_bonus.c ✅
+- src/bonus/doors_bonus.c ✅
+- src/bonus/render_bonus.c ✅ (versione bonus di render.c)
+- src/bonus/keys_bonus.c ✅ (versione bonus di keys.c)
+- src/parser/parser_utils/parser_utils2.c ✅ (estratto da parser_utils.c)
+
+NOTE: il parser (Sprint 6) è stato implementato da Ilaria.
+Il mandatory è completamente implementato e supera i test.
+Il bonus minimap e porte è implementato e integrato.
+La norminette è stata passata completamente il 23 marzo.
+
+---
+
+PRIORITÀ ASSOLUTA (non saltare):
+1. compilare su Linux senza errori ← PROSSIMO STEP
+2. valgrind runtime — zero leak confermato
+3. test correction sheet mandatory completa
+4. test correction sheet bonus

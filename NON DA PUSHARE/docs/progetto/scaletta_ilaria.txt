@@ -1,0 +1,140 @@
+CUB3D - Scaletta di Ilaria
+(aggiornata al 23 marzo 2026)
+
+---
+
+I TUOI FILE:
+- src/events/events.c, keys.c
+- src/render/render.c, draw_walls.c, draw_floor_ceiling.c, textures.c, weapon.c
+- src/raycaster/raycaster.c, dda.c, player_move.c
+- src/parser/parse_file.c, parse_textures.c, parse_colors.c, parse_map.c, validate_map.c
+- src/utils/error.c, free.c, utils.c
+- BONUS: src/bonus/mouse_bonus.c (stub), src/bonus/sprites_anim_bonus.c (stub)
+
+NOTE: Gabriela ha aggiunto e modificato i seguenti file nel tuo lavoro (23/03/2026):
+- events.c: riscritto per norminette (rimossi commenti standalone in funzioni)
+- keys.c: rimosso #ifdef BONUS da key_press; riscritto per norminette
+- render.c: rimosso #ifdef BONUS da render(); riscritto per norminette
+- draw_walls.c, draw_floor_ceiling.c, textures.c, weapon.c: convertiti da spazi a tab
+- weapon.c: aggiunto fix free_weapon (img.img azzerato dopo destroy); rimosso ~
+- dda.c: rimosso commento bonus da dda_loop (norminette); aggiunto stop su '2'
+- player_move.c: rimossi commenti in funzioni e caratteri non-ASCII; is_walkable tratta '2' come muro
+- validate_map.c: '2' aggiunto ai caratteri validi; rimosso commento da funzione
+- error.c: rimossi commenti standalone da error_exit
+- free.c: safe_free spostata in utils.c (era 6 funzioni, ora 5)
+- utils.c: aggiunta safe_free; corretta doppia riga vuota
+- parser_utils.c: ridotto a 5 funzioni (is_valid_uint_str e count_str_array → parser_utils2.c)
+- include/defines.h: aggiunto KEY_E, MINIMAP_SCALE/MARGIN/colori
+
+---
+
+STUDIO INIZIALE ✅ COMPLETATO
+
+---
+
+SETUP MINILIBX + EVENTI ✅ COMPLETATO
+- src/events/events.c: init_mlx, create_window, setup_hooks, start_loop, close_window
+  → fix memory leak: aggiunto free(mlx) quando mlx_new_window fallisce
+  → norminette: riscritto, rimossi commenti standalone in corpi funzione
+- src/events/keys.c: init_keys, key_press, key_release
+  → norminette: rimosso #ifdef BONUS da key_press; rimossi commenti standalone
+  → la gestione KEY_E per bonus è in src/bonus/keys_bonus.c
+- src/render/render.c: init_image, my_mlx_pixel_put, clear_image, render
+  → norminette: rimosso #ifdef BONUS da render(); rimossi commenti standalone
+  → la chiamata a render_minimap() è in src/bonus/render_bonus.c
+
+---
+
+RAY-CASTING DDA ✅ COMPLETATO
+- src/raycaster/raycaster.c: raycast() — loop per colonna, calcolo camera e ray_dir
+- src/raycaster/dda.c: perform_dda() — init_delta, init_steps, dda_loop, distanza perpendicolare
+  → dda_loop ora si ferma anche su '2' (porta chiusa) — bonus porte
+  → norminette: rimosso commento bonus da dda_loop
+- src/raycaster/player_move.c: is_walkable, rotate_player, move_forward_back, move_strafe, move_player
+  → is_walkable ora tratta '2' come muro — bonus porte
+  → norminette: rimossi commenti in funzioni; sostituiti caratteri non-ASCII
+
+---
+
+RENDERING MURI + MOVIMENTO ✅ COMPLETATO
+- src/render/draw_walls.c: calc_draw_bounds, calc_tex_y, draw_wall
+  → norminette: riscritto con tab (erano spazi)
+- src/render/draw_floor_ceiling.c: draw_ceiling, draw_floor, draw_floor_ceiling
+  → norminette: riscritto con tab
+- src/raycaster/player_move.c: vedi RAY-CASTING DDA sopra
+
+---
+
+TEXTURE ✅ COMPLETATO
+- src/render/textures.c: load_texture, load_all_textures, get_texture, get_tex_pixel, get_tex_x
+  → norminette: riscritto con tab
+- src/render/weapon.c: caricamento e rendering arma, free_weapon
+  → fix: free_weapon ora azzera img.img dopo mlx_destroy_image
+  → norminette: riscritto con tab; rimosso ~ spurio
+
+---
+
+PARSER ✅ COMPLETATO
+- src/parser/parse_file.c: parse_file (5 funzioni, 25 righe max ✅)
+- src/parser/parse_textures.c: parsing NO/SO/WE/EA
+- src/parser/parse_colors.c: parsing F e C con RGB
+- src/parser/parse_map.c: lettura griglia, posizione giocatore
+- src/parser/validate_map.c: validazione caratteri, mappa chiusa
+  → aggiunto '2' ai caratteri validi — bonus porte
+  → norminette: rimosso commento da is_valid_map_char
+- src/parser/parser_utils/parser_utils.c: 5 funzioni (append_line, read_all_lines,
+  is_header_line, skip_whitespace, trim_newline)
+- src/parser/parser_utils/parser_utils2.c: NUOVO — is_valid_uint_str, count_str_array
+  (estratte da parser_utils.c che aveva 7 funzioni → norminette)
+
+---
+
+UTILS ✅ COMPLETATO
+- src/utils/error.c: error_exit
+  → norminette: rimossi commenti standalone da corpo funzione
+- src/utils/free.c: free_map, free_textures, free_main_image, free_game, free_str_array
+  (5 funzioni ✅ — safe_free spostata in utils.c per norminette)
+- src/utils/utils.c: create_color, safe_free
+  → safe_free aggiunta qui (da free.c) per rispettare max 5 funzioni/file
+
+---
+
+NORMINETTE v4.1 ✅ COMPLETATO (23 marzo 2026, Gabriela)
+
+Pass completo su tutti i file. Violazioni corrette:
+- Commenti standalone dentro corpi di funzione → rimossi
+- #ifdef dentro corpi di funzione → sostituiti con file separati bonus
+- >5 funzioni per file → ridistribuito
+- Spazi invece di tab → convertiti
+- Caratteri non-ASCII in commenti → sostituiti (e' al posto di è)
+- Funzioni >25 righe → estratti helper
+
+---
+
+QA: TEST E NORMINETTE 🚧 IN CORSO
+
+✅ Norminette v4.1 — pass completo
+✅ Fix memory leak: create_window e free_weapon
+⏳ Compilare su Linux — zero warning/errori (make + make bonus)
+⏳ Valgrind — zero memory leak a runtime
+⏳ Test correction sheet mandatory
+⏳ Test error management
+⏳ Test stabilità (input casuale)
+
+---
+
+BONUS 🚧 IN CORSO
+
+✅ minimap_bonus.c — minimap 2D overlay (Gabriela)
+✅ doors_bonus.c — porte apribili con E (Gabriela)
+✅ render_bonus.c — versione bonus di render.c con render_minimap (Gabriela)
+✅ keys_bonus.c — versione bonus di keys.c con handle_doors (Gabriela)
+✅ mouse_bonus.c — stub creato (TUO da implementare)
+✅ sprites_anim_bonus.c — stub creato (TUO da implementare)
+⏳ Rotazione con il mouse — implementazione reale (TUO)
+⏳ Sprite animati con frame multipli — implementazione reale (TUO)
+
+---
+
+TOTALE STIMATO: circa 40-50 ore
+CONSEGNA: 24 marzo 2026 (push all'80)

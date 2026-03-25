@@ -1,0 +1,69 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   draw_walls.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vhacman <vhacman@student.42roma.it>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/16 01:19:17 by ilnassi           #+#    #+#             */
+/*   Updated: 2026/03/23 15:25:59 by vhacman          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "cub3d.h"
+
+/* Calcola i pixel di inizio e fine della colonna verticale del muro.
+ * line_height e' inversamente proporzionale alla distanza.
+ * I valori vengono clampati ai bordi dello schermo. */
+static void	calc_draw_bounds(double perp_wall_dist, int *draw_start,
+				int *draw_end, int *line_height)
+{
+	*line_height = (int)(SCREEN_HEIGHT / perp_wall_dist);
+	*draw_start = SCREEN_HEIGHT / 2 - *line_height / 2;
+	if (*draw_start < 0)
+		*draw_start = 0;
+	*draw_end = SCREEN_HEIGHT / 2 + *line_height / 2;
+	if (*draw_end >= SCREEN_HEIGHT)
+		*draw_end = SCREEN_HEIGHT - 1;
+}
+
+/* Calcola tex_y: la riga nella texture per il pixel y.
+ * Usa la posizione reale rispetto all'intera altezza della colonna,
+ * non solo la parte visibile. Il clamp evita out-of-bounds vicino al muro. */
+static int	calc_tex_y(int y, int line_height, t_texture *tex)
+{
+	int	real_y;
+	int	tex_y;
+
+	real_y = y + line_height / 2 - SCREEN_HEIGHT / 2;
+	tex_y = (real_y * tex->height) / line_height;
+	if (tex_y < 0)
+		tex_y = 0;
+	if (tex_y >= tex->height)
+		tex_y = tex->height - 1;
+	return (tex_y);
+}
+
+/* Disegna la colonna verticale del muro con texture.
+ * Seleziona la texture corretta per lato (N/S/E/W),
+ * calcola tex_x e per ogni pixel calcola tex_y e scrive il colore. */
+void	draw_wall(t_game *game, int x, double perp_wall_dist, int side)
+{
+	t_wall		w;
+	t_texture	*tex;
+
+	if (perp_wall_dist <= 0)
+		perp_wall_dist = 0.0001;
+	calc_draw_bounds(perp_wall_dist, &w.draw_start,
+		&w.draw_end, &w.line_height);
+	tex = get_texture(game, side);
+	w.tex_x = get_tex_x(game, tex, side, perp_wall_dist);
+	w.y = w.draw_start;
+	while (w.y <= w.draw_end)
+	{
+		my_mlx_pixel_put(&game->img, x, w.y,
+			get_tex_pixel(tex, w.tex_x,
+				calc_tex_y(w.y, w.line_height, tex)));
+		w.y++;
+	}
+}

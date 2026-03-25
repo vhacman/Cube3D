@@ -1,0 +1,69 @@
+# Aggiornamento cub3D — 18 marzo
+
+Ciao Ilaria!
+
+un riassunto di quello che ho fatto oggi sul progetto, così sei allineata.
+
+---
+
+## Cosa ho fatto
+
+### Il parser — praticamente da zero
+
+Oggi mi sono dedicata quasi tutta al parser, cioè alla parte che legge il file `.cub` e ci mette dentro tutti i dati (texture, colori, mappa).
+
+Ho creato questi file:
+
+- **`parse_file.c`** — è il "coordinatore": apre il file, legge tutte le righe, capisce dove finiscono le impostazioni (NO/SO/F/C ecc.) e dove inizia la mappa vera e propria, e smista tutto agli altri.
+- **`parse_textures.c`** — legge le righe tipo `NO ./textures/north.xpm` e salva il path. Controlla anche se hai scritto due volte la stessa texture (errore).
+- **`parse_colors.c`** — legge `F 220,100,0` e `C 225,30,0`, valida che siano numeri tra 0 e 255 e salva i colori. Ho usato `-1` come valore di "non ancora impostato" perché `0` è il nero ed è un colore valido — non potevo usarlo come sentinel.
+- **`parse_map.c`** — prende le righe della mappa, costruisce la griglia 2D (array di stringhe) e trova dove sta il giocatore (il carattere N/S/E/W).
+- **`validate_map.c`** — controlla che la mappa sia chiusa, cioè che nessuna cella percorribile (pavimento, spawn) sia aperta verso l'esterno. Lo fa guardando i 4 vicini di ogni cella: se uno è uno spazio o fuori dalla griglia → errore.
+- **`parser_utils/parser_utils.c`** — funzioni di supporto usate da tutti gli altri: legge le righe dal file con GNL, salta gli spazi, toglie i `\n`, valida le stringhe numeriche, ecc. `realloc` non è nelle funzioni permesse quindi ho dovuto fare il "realloc a mano" con calloc + memcpy.
+
+---
+
+### Il `main.c` — finalmente non è più vuoto
+
+Prima `main.c` era completamente vuoto e il progetto non compilava. Oggi l'ho scritto. Fa questa cosa in ordine:
+
+1. Controlla che ci sia esattamente 1 argomento (il file `.cub`)
+2. Parsa il file
+3. Controlla che ci siano tutte e 4 le texture e i 2 colori (se manca qualcosa → errore)
+4. Valida la mappa
+5. Inizializza la posizione e la direzione del giocatore (converte il carattere N/S/E/W in vettori direzione per il raycaster)
+6. Avvia MLX, crea la finestra, carica le texture, registra gli hook
+7. Parte il loop
+
+---
+
+### `free.c` — perfezionato
+
+Ho sistemato un po' di cose che non andavano:
+- dopo `mlx_destroy_image` il puntatore non veniva azzerato → rischio doppio-free
+- `free_map` non azzerava `player_x`, `player_y`, `player_dir`
+- `free_main_image` non azzerava `game->img.img` dopo la destroy
+- rimossi commenti multi-riga dentro i corpi di funzione 
+
+---
+
+### Roba minore
+
+- Ho spostato `free_str_array` e `safe_free` da `utils.c` a `free.c` (stavano nel posto sbagliato)
+- Ho aggiunto la chiamata a `draw_weapon()` nel render loop, così l'arma appare sopra la scena
+- Ho aggiunto `free_weapon()` nella funzione di cleanup
+- Ho aggiunto uno stub per `render_sprites()` così il linker non si lamenta
+- Makefile: ho tolto il commento inline che era rimasto su una riga di MLX_FLAGS (la flag era già stata cambiata in `-lmlx_Linux` in un commit precedente — non so se funziona, non posso compilare da Windows) // non sono sicura qua
+- Rimosso `#include <math.h>` duplicato in `dda.c` e `player_move.c`
+
+---
+
+## Stato attuale
+
+Il progetto **dovrebbe compilare**. Non ho ancora testato su Linux perché sto lavorando su Windows, quindi appena puoi fai un `make` e dimmi se crolla qualcosa.
+
+Le cose che secondo me mancano ancora (o sono stub) sono:
+- `render_sprites` — è vuota, non fa nulla
+- le funzioni dell'arma (`load_weapon`, `draw_weapon`, `free_weapon`) — esistono nell'header ma non so se sono implementate o stub
+
+Fammi sapere!
